@@ -16,100 +16,85 @@
         </div>
     </div>
 
-    {% if best_card %}
-    <div class="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-700 rounded-2xl p-8 text-white shadow-xl mb-10">
-        <div class="relative z-10">
-            <h2 class="text-indigo-100 text-sm font-semibold uppercase tracking-wider">Top Recommendation</h2>
-            <p class="text-lg opacity-90 mt-1">Based on your closing dates, today you should use:</p>
-            <div class="mt-4 flex items-baseline">
-                <span class="text-4xl font-black">{{ best_card.bank_name }}</span>
-                <span class="ml-3 text-xl font-medium opacity-80">{{ best_card.card_name }}</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        {% if best_card %}
+        <div class="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl">
+            <div class="relative z-10">
+                <h2 class="text-indigo-100 text-xs font-bold uppercase tracking-wider">Best to use today</h2>
+                <div class="mt-4">
+                    <span class="text-3xl font-black block">{{ best_card.bank_name }}</span>
+                    <span class="text-lg opacity-80">{{ best_card.card_name }}</span>
+                </div>
+                <p class="mt-4 text-xs italic flex items-center">
+                    <i class="fa-solid fa-circle-check mr-2"></i> Maximiza tu fecha de pago.
+                </p>
             </div>
-            <p class="mt-4 text-indigo-100 flex items-center italic">
-                <i class="fa-solid fa-circle-check mr-2"></i>
-                Using this card maximizes your payment term.
-            </p>
+            <i class="fa-solid fa-bolt absolute -right-2 -bottom-2 text-8xl text-white opacity-10"></i>
         </div>
-        <i class="fa-solid fa-bolt absolute -right-4 -bottom-4 text-9xl text-white opacity-10"></i>
+        {% endif %}
+
+        {% if next_to_pay %}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-lg relative overflow-hidden">
+            <h2 class="text-gray-400 text-xs font-bold uppercase tracking-wider">Next Payment Due</h2>
+            <div class="mt-4">
+                <span class="text-3xl font-black block text-gray-800">{{ next_to_pay.card.bank_name }}</span>
+                <span class="text-lg text-red-500 font-bold italic">Due: {{ next_to_pay.due_date|date:"M d" }}</span>
+            </div>
+            <p class="mt-4 text-gray-900 font-bold text-xl">${{ next_to_pay.non_interest_payment }}</p>
+            <i class="fa-solid fa-clock-rotate-left absolute -right-2 -bottom-2 text-8xl text-gray-100"></i>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h3 class="text-lg font-bold text-gray-700 mb-4 text-center">Credit Distribution</h3>
-            <div class="h-64">
-                <canvas id="limitsChart"></canvas>
-            </div>
+            <div class="h-64"><canvas id="limitsChart"></canvas></div>
         </div>
-
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h3 class="text-lg font-bold text-gray-700 mb-4 text-center">Overall Credit Health</h3>
-            <div class="h-64">
-                <canvas id="healthChart"></canvas>
-            </div>
+            <div class="h-64"><canvas id="healthChart"></canvas></div>
         </div>
     </div>
 
     <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold text-gray-700">Pending Payments</h3>
-        <a href="{% url 'statements:history' %}" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 transition">
-            View Full History →
-        </a>
+        <a href="{% url 'statements:history' %}" class="text-sm text-indigo-600 font-semibold hover:underline">View History →</a>
     </div>
-
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Card</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Due Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Amount</th>
+                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Action</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200" id="pending-table-body">
+            <tbody class="bg-white divide-y divide-gray-200">
                 {% for statement in pending_statements %}
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <td class="px-6 py-4">
                         <div class="font-bold text-gray-900">{{ statement.card.bank_name }}</div>
                         <div class="text-gray-500 text-xs">{{ statement.month_year|date:"F Y" }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <div class="font-medium text-gray-700">{{ statement.due_date|date:"M d, Y" }}</div>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium">{{ statement.due_date|date:"M d, Y" }}</div>
                         {% with days=statement.days_until_due %}
                             {% if days is not None %}
                                 {% if days < 0 %}
                                     <span class="text-[10px] font-bold text-red-600 uppercase">Overdue</span>
                                 {% elif days <= 3 %}
-                                    <span class="text-[10px] font-bold text-orange-500 uppercase animate-pulse">
-                                        <i class="fa-solid fa-triangle-exclamation"></i> Due in {{ days }} days!
-                                    </span>
+                                    <span class="text-[10px] font-bold text-orange-500 uppercase animate-pulse italic italic">Due in {{ days }} days!</span>
                                 {% else %}
-                                    <span class="text-[10px] font-medium text-gray-400 uppercase italic">{{ days }} days left</span>
+                                    <span class="text-[10px] font-medium text-gray-400 uppercase">{{ days }} days left</span>
                                 {% endif %}
                             {% endif %}
                         {% endwith %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">
-                        ${{ statement.non_interest_payment }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
-                            hx-post="{% url 'statements:mark_as_paid' statement.id %}" 
-                            hx-target="closest tr" 
-                            hx-swap="outerHTML swap:1s"
-                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                            hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)"
-                            class="text-indigo-600 hover:text-indigo-900 font-bold transition">
-                            Mark as Paid
-                        </button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-gray-400 italic">
-                        <i class="fa-solid fa-face-smile text-emerald-500 text-xl mb-2 block"></i>
-                        No pending payments. You are up to date!
+                    <td class="px-6 py-4 text-red-600 font-black">${{ statement.non_interest_payment }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" hx-target="closest tr" hx-swap="outerHTML swap:1s" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)" class="text-indigo-600 font-bold hover:text-indigo-900">Mark as Paid</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -119,50 +104,30 @@
 
     <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold text-gray-700">Installment Plans & MSI</h3>
-        <a href="{% url 'cards:plan_add' %}" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
-            + Add New Plan
-        </a>
+        <a href="{% url 'cards:plan_add' %}" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold">+ Add Plan</a>
     </div>
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {% for plan in installment_plans %}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h4 class="font-bold text-gray-800">{{ plan.name }}</h4>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %} font-bold uppercase">
-                        {{ plan.get_type_display }}
-                    </span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %} font-bold uppercase">{{ plan.get_type_display }}</span>
                 </div>
                 <div class="text-right">
-                    <span class="text-sm font-bold text-gray-900">${{ plan.monthly_payment }}</span>
-                    <p class="text-[10px] text-gray-400 italic">monthly</p>
+                    <span class="text-sm font-bold">${{ plan.monthly_payment }}</span>
+                    <p class="text-[10px] text-gray-400">monthly</p>
                 </div>
             </div>
-
             <div class="space-y-2">
                 <div class="flex justify-between text-xs">
-                    <span class="text-gray-500">Progress: {{ plan.current_installment }} / {{ plan.total_installments }}</span>
+                    <span class="text-gray-500">{{ plan.current_installment }}/{{ plan.total_installments }}</span>
                     <span class="font-bold text-indigo-600">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-2">
-                    <div class="bg-indigo-600 h-2 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(79,70,229,0.3)]" 
-                         style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
-                </div>
-                <div class="flex justify-between text-[11px] pt-1">
-                    <span class="text-gray-400">Start: {{ plan.start_date|date:"M Y" }}</span>
-                    <span class="text-gray-600 font-medium">Pending: ${{ plan.remaining_amount }}</span>
+                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                    <div class="bg-indigo-600 h-1.5 rounded-full" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
                 </div>
             </div>
-            
-            <div class="mt-4 pt-3 border-t border-gray-50 flex items-center text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                <i class="fa-solid fa-credit-card mr-2 text-indigo-300"></i>
-                {{ plan.card.bank_name }}
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-span-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl py-10 text-center">
-            <p class="text-gray-400 text-sm italic">No installment plans registered.</p>
         </div>
         {% endfor %}
     </div>
@@ -170,24 +135,19 @@
     <h3 class="text-xl font-bold text-gray-700 mb-4">My Credit Cards</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for card in cards %}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="bg-indigo-50 p-3 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <i class="fa-solid fa-credit-card"></i>
+        <div class="rounded-2xl p-6 text-white shadow-lg transition transform hover:-translate-y-1 relative" style="background-color: {{ card.color|default:'#4f46e5' }};">
+            <div class="flex justify-between items-start mb-10">
+                <span class="font-bold text-xl italic">{{ card.bank_name }}</span>
+                <div class="flex space-x-2">
+                    <a href="{% url 'cards:card_edit' card.pk %}" class="bg-white/20 p-1.5 rounded hover:bg-white/40 transition"><i class="fa-solid fa-pen text-xs"></i></a>
+                    <a href="{% url 'cards:card_delete' card.pk %}" class="bg-white/20 p-1.5 rounded hover:bg-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></a>
                 </div>
-                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">ID: {{ card.id }}</span>
             </div>
-            <h4 class="font-bold text-gray-800 text-lg">{{ card.bank_name }}</h4>
-            <p class="text-gray-500 text-sm mb-4">{{ card.card_name }}</p>
-            
-            <div class="border-t border-gray-50 pt-4 space-y-2">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">Limit:</span>
-                    <span class="font-semibold text-gray-700">${{ card.credit_limit }}</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">Closing:</span>
-                    <span class="font-medium text-indigo-600">{{ card.closing_day }}th</span>
+            <div>
+                <h4 class="font-bold tracking-widest uppercase">{{ card.card_name }}</h4>
+                <div class="flex justify-between items-end mt-4">
+                    <div class="text-xs opacity-80 uppercase tracking-tighter">Limit: ${{ card.credit_limit }}</div>
+                    <div class="text-xs font-black bg-black/20 px-2 py-1 rounded">Corte: {{ card.closing_day }}th</div>
                 </div>
             </div>
         </div>
@@ -199,45 +159,25 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const chartOptions = { 
-        maintainAspectRatio: false, 
-        cutout: '75%',
-        plugins: { 
-            legend: { 
-                position: 'bottom',
-                labels: { usePointStyle: true, padding: 20 }
-            } 
-        } 
-    };
-
-    // Gráfica de Límites (Distribución)
+    const chartOptions = { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } } };
+    
     new Chart(document.getElementById('limitsChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: {{ chart_labels|safe }},
-            datasets: [{
-                data: {{ chart_limits|safe }},
-                backgroundColor: ['#4f46e5', '#818cf8', '#c084fc', '#fb7185', '#34d399', '#fbbf24'],
-                borderWidth: 0
-            }]
+            datasets: [{ data: {{ chart_limits|safe }}, backgroundColor: ['#4f46e5', '#818cf8', '#c084fc', '#fb7185', '#34d399', '#fbbf24'], borderWidth: 0 }]
         },
         options: chartOptions
     });
 
-    // Gráfica de Salud (Deuda Actual vs Bloqueado MSI vs Disponible)
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: ['Due This Month', 'Locked (MSI)', 'Available Credit'],
-            datasets: [{
-                data: {{ debt_data|safe }},
-                backgroundColor: [
-                    '#f43f5e', // Rojo (Urgente)
-                    '#9ca3af', // Gris (Retenido por MSI futuros)
-                    '#10b981'  // Verde (Disponible real)
-                ],
-                hoverOffset: 4,
-                borderWidth: 0
+            datasets: [{ 
+                data: {{ debt_data|safe }}, 
+                backgroundColor: ['#f43f5e', '#9ca3af', '#10b981'], 
+                borderWidth: 0 
             }]
         },
         options: chartOptions

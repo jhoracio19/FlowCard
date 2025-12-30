@@ -1,33 +1,140 @@
 {% extends 'base.html' %}
 
-{% block title %}Add New Card - FlowCard{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit Card{% else %}Add New Card{% endif %} - FlowCard{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Add a New Credit Card</h1>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div class="space-y-4">
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>
-                {% endif %}
+<div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        
+        <div class="lg:sticky lg:top-24">
+            <h2 class="text-xl font-bold text-gray-700 mb-6 flex items-center">
+                <i class="fa-solid fa-eye mr-2 text-indigo-500"></i> Live Preview
+            </h2>
+            
+            <div id="card-preview" 
+                 class="w-full aspect-[1.6/1] rounded-3xl p-8 text-white shadow-2xl transition-all duration-500 flex flex-col justify-between"
+                 style="background-color: {{ form.instance.color|default:'#4f46e5' }};">
+                
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 mb-1">Bank Institution</p>
+                        <span id="preview-bank" class="text-2xl font-black tracking-tight italic">
+                            {{ form.instance.bank_name|default:"BANK NAME" }}
+                        </span>
+                    </div>
+                    <i class="fa-solid fa-bolt-lightning text-3xl opacity-50"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-9 bg-gradient-to-br from-yellow-200 to-yellow-500 rounded-md opacity-80 shadow-inner"></div>
+                        <i class="fa-solid fa-wifi text-xl opacity-40 self-center"></i>
+                    </div>
+                    <div>
+                        <p id="preview-name" class="text-xl font-medium tracking-[0.15em] uppercase">
+                            {{ form.instance.card_name|default:"CARD NAME" }}
+                        </p>
+                        <div class="flex justify-between items-end mt-2">
+                            <p class="text-sm font-mono opacity-80">**** **** **** 8888</p>
+                            <div class="text-right">
+                                <p class="text-[8px] uppercase opacity-60 leading-none">Limit</p>
+                                <p class="text-sm font-bold">$<span id="preview-limit">{{ form.instance.credit_limit|default:"0" }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endfor %}
+
+            <div class="mt-10 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <p class="text-sm font-bold text-gray-600 mb-4 text-center uppercase tracking-widest">Select Card Style</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button type="button" onclick="updateColor('#1e40af', 'blue')" class="w-10 h-10 rounded-full bg-blue-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#b91c1c', 'red')" class="w-10 h-10 rounded-full bg-red-700 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#065f46', 'emerald')" class="w-10 h-10 rounded-full bg-emerald-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#1f2937', 'gray')" class="w-10 h-10 rounded-full bg-gray-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#78350f', 'amber')" class="w-10 h-10 rounded-full bg-amber-900 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#5b21b6', 'purple')" class="w-10 h-10 rounded-full bg-purple-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <div class="relative w-10 h-10 rounded-full border-4 border-white shadow-lg overflow-hidden flex items-center justify-center bg-gray-100">
+                        <i class="fa-solid fa-plus text-gray-400 absolute pointer-events-none"></i>
+                        <input type="color" id="color-picker" oninput="updateColor(this.value)" class="absolute w-16 h-16 cursor-pointer opacity-0">
+                    </div>
+                </div>
+                <input type="hidden" name="color" id="id_color" value="{{ form.instance.color|default:'#4f46e5' }}">
+            </div>
         </div>
 
-        <div class="mt-8 flex gap-4">
-            <button type="submit" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition">
-                Save Card
-            </button>
-            <a href="{% url 'cards:dashboard' %}" class="flex-1 text-center bg-gray-100 text-gray-600 py-2 rounded-lg font-bold hover:bg-gray-200 transition">
-                Cancel
-            </a>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+            <h1 class="text-2xl font-black text-gray-800 mb-2">
+                {% if form.instance.pk %}Edit Credit Card{% else %}Add New Card{% endif %}
+            </h1>
+            <p class="text-gray-500 mb-8">Enter your card details accurately to optimize your financial cycles.</p>
+            
+            <form method="post" id="card-form">
+                {% csrf_token %}
+                <div class="space-y-6">
+                    {% for field in form %}
+                        {% if field.name != 'color' %} <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <p class="text-[10px] text-gray-400 mt-1 italic">{{ field.help_text }}</p>
+                            {% endif %}
+                            {% if field.errors %}
+                                <p class="text-red-500 text-xs mt-1 font-bold">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="mt-10 flex flex-col gap-3">
+                    <button type="submit" class="w-full bg-black text-white py-4 rounded-2xl font-black hover:bg-gray-800 transition-all transform hover:shadow-xl active:scale-95">
+                        {% if form.instance.pk %}Update Card Information{% else %}Confirm & Save Card{% endif %}
+                    </button>
+                    <a href="{% url 'cards:dashboard' %}" class="w-full text-center text-gray-400 py-2 text-sm font-bold hover:text-gray-600 transition">
+                        Discard Changes
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
+
+
+
+<script>
+    // Referencias a los inputs del formulario generado por Django
+    const bankInput = document.querySelector('input[name="bank_name"]');
+    const cardNameInput = document.querySelector('input[name="card_name"]');
+    const limitInput = document.querySelector('input[name="credit_limit"]');
+    const colorHiddenInput = document.getElementById('id_color');
+    const cardPreview = document.getElementById('card-preview');
+
+    // Función para actualizar color
+    function updateColor(color) {
+        cardPreview.style.backgroundColor = color;
+        colorHiddenInput.value = color;
+    }
+
+    // Event Listeners para el Live Preview
+    bankInput.addEventListener('input', (e) => {
+        document.getElementById('preview-bank').innerText = e.target.value.toUpperCase() || 'BANK NAME';
+    });
+
+    cardNameInput.addEventListener('input', (e) => {
+        document.getElementById('preview-name').innerText = e.target.value.toUpperCase() || 'CARD NAME';
+    });
+
+    limitInput.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value) || 0;
+        document.getElementById('preview-limit').innerText = value.toLocaleString();
+    });
+
+    // Estilo inicial de los inputs de Django para que se vean bien con Tailwind
+    document.querySelectorAll('#card-form input, #card-form select').forEach(el => {
+        el.classList.add('w-full', 'p-3', 'bg-gray-50', 'border', 'border-gray-200', 'rounded-xl', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:bg-white', 'transition-all', 'outline-none');
+    });
+</script>
 {% endblock %}

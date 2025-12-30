@@ -7,7 +7,7 @@ class StatementForm(forms.ModelForm):
         model = MonthlyStatement
         fields = ['card', 'month_year', 'min_payment', 'non_interest_payment']
         widgets = {
-            'month_year': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border rounded-lg'}),
+            'month_year': forms.DateInput(attrs={'type': 'month', 'class': 'w-full p-2 border rounded-lg'}),
             'card': forms.Select(attrs={'class': 'w-full p-2 border rounded-lg'}),
             'min_payment': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
             'non_interest_payment': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),

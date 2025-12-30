@@ -7,6 +7,7 @@ class CreditCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cards')
     bank_name = models.CharField(max_length=50)
     card_name = models.CharField(max_length=50, help_text="Ej. Visa Gold")
+    color = models.CharField(max_length=7, default="#4f46e5")
     credit_limit = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     
     # Days of the month (1-31)
