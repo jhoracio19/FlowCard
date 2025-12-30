@@ -1,7 +1,6 @@
 # apps/cards/forms.py
 from django import forms
-from .models import CreditCard
-
+from .models import InstallmentPlan, CreditCard
 class CreditCardForm(forms.ModelForm):
     class Meta:
         model = CreditCard
@@ -13,3 +12,27 @@ class CreditCardForm(forms.ModelForm):
             'closing_day': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg', 'min': 1, 'max': 31}),
             'due_day': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg', 'min': 1, 'max': 31}),
         }
+
+class InstallmentPlanForm(forms.ModelForm):
+    class Meta:
+        model = InstallmentPlan
+        fields = [
+            'card', 'name', 'type', 'total_amount', 
+            'total_installments', 'current_installment', 
+            'monthly_payment', 'start_date'
+        ]
+        widgets = {
+            'card': forms.Select(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Ej. Laptop Work', 'class': 'w-full p-2 border rounded-lg'}),
+            'type': forms.Select(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'total_amount': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'total_installments': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'current_installment': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'monthly_payment': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border rounded-lg'}),
+        }
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Solo mostrar tarjetas del usuario logueado
+        self.fields['card'].queryset = CreditCard.objects.filter(user=user)

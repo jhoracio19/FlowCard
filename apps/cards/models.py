@@ -40,3 +40,26 @@ class MonthlyStatement(models.Model):
 
     def __str__(self):
         return f"{self.card.card_name} - {self.month_year.strftime('%B %Y')}"
+
+class InstallmentPlan(models.Model):
+    PLAN_TYPES = [
+        ('MSI', 'Meses sin Intereses'),
+        ('FIXED', 'Pagos Fijos / Reestructura'),
+    ]
+    
+    card = models.ForeignKey(CreditCard, on_delete=models.CASCADE, related_name='plans')
+    name = models.CharField(max_length=100, help_text="Ej: iPhone 15 o Reestructura Enero")
+    type = models.CharField(max_length=10, choices=PLAN_TYPES, default='MSI')
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    total_installments = models.IntegerField(help_text="Número total de meses")
+    current_installment = models.IntegerField(default=1, help_text="En qué mes vas actualmente")
+    monthly_payment = models.DecimalField(max_digits=12, decimal_places=2, help_text="Monto a pagar cada mes")
+    start_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+
+    @property
+    def remaining_amount(self):
+        return self.total_amount - (self.monthly_payment * (self.current_installment - 1))
+
+    def __str__(self):
+        return f"{self.name} ({self.current_installment}/{self.total_installments})"

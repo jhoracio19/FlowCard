@@ -117,6 +117,56 @@
         </table>
     </div>
 
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-700">Installment Plans & MSI</h3>
+        <a href="{% url 'cards:plan_add' %}" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
+            + Add New Plan
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        {% for plan in installment_plans %}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h4 class="font-bold text-gray-800">{{ plan.name }}</h4>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %} font-bold uppercase">
+                        {{ plan.get_type_display }}
+                    </span>
+                </div>
+                <div class="text-right">
+                    <span class="text-sm font-bold text-gray-900">${{ plan.monthly_payment }}</span>
+                    <p class="text-[10px] text-gray-400 italic">monthly</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                    <span class="text-gray-500">Progress: {{ plan.current_installment }} / {{ plan.total_installments }}</span>
+                    <span class="font-bold text-indigo-600">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-indigo-600 h-2 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(79,70,229,0.3)]" 
+                         style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
+                </div>
+                <div class="flex justify-between text-[11px] pt-1">
+                    <span class="text-gray-400">Start: {{ plan.start_date|date:"M Y" }}</span>
+                    <span class="text-gray-600 font-medium">Pending: ${{ plan.remaining_amount }}</span>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-gray-50 flex items-center text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+                <i class="fa-solid fa-credit-card mr-2 text-indigo-300"></i>
+                {{ plan.card.bank_name }}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl py-10 text-center">
+            <p class="text-gray-400 text-sm italic">No installment plans registered.</p>
+        </div>
+        {% endfor %}
+    </div>
+
     <h3 class="text-xl font-bold text-gray-700 mb-4">My Credit Cards</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for card in cards %}
@@ -125,7 +175,7 @@
                 <div class="bg-indigo-50 p-3 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <i class="fa-solid fa-credit-card"></i>
                 </div>
-                <span class="text-[10px] font-bold text-gray-300">CARD ID: {{ card.id }}</span>
+                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">ID: {{ card.id }}</span>
             </div>
             <h4 class="font-bold text-gray-800 text-lg">{{ card.bank_name }}</h4>
             <p class="text-gray-500 text-sm mb-4">{{ card.card_name }}</p>
@@ -137,7 +187,7 @@
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-400">Closing:</span>
-                    <span class="font-medium text-indigo-600">{{ card.closing_day }}th of month</span>
+                    <span class="font-medium text-indigo-600">{{ card.closing_day }}th</span>
                 </div>
             </div>
         </div>
@@ -174,14 +224,19 @@
         options: chartOptions
     });
 
-    // Gráfica de Salud (Deuda vs Disponible)
+    // Gráfica de Salud (Deuda Actual vs Bloqueado MSI vs Disponible)
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Total Debt', 'Available Credit'],
+            labels: ['Due This Month', 'Locked (MSI)', 'Available Credit'],
             datasets: [{
                 data: {{ debt_data|safe }},
-                backgroundColor: ['#f43f5e', '#10b981'],
+                backgroundColor: [
+                    '#f43f5e', // Rojo (Urgente)
+                    '#9ca3af', // Gris (Retenido por MSI futuros)
+                    '#10b981'  // Verde (Disponible real)
+                ],
+                hoverOffset: 4,
                 borderWidth: 0
             }]
         },
