@@ -7,11 +7,11 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Insights</h1>
         <div class="flex gap-2">
-            <a href="{% url 'statements:add' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition">
-                + Add Statement
+            <a href="{% url 'statements:add' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">
+                <i class="fa-solid fa-file-invoice-dollar mr-1"></i> + Add Statement
             </a>
-            <a href="{% url 'cards:card_add' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition">
-                + Add New Card
+            <a href="{% url 'cards:card_add' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">
+                <i class="fa-solid fa-credit-card mr-1"></i> + Add New Card
             </a>
         </div>
     </div>
@@ -25,7 +25,7 @@
                 <span class="text-4xl font-black">{{ best_card.bank_name }}</span>
                 <span class="ml-3 text-xl font-medium opacity-80">{{ best_card.card_name }}</span>
             </div>
-            <p class="mt-4 text-indigo-100 flex items-center">
+            <p class="mt-4 text-indigo-100 flex items-center italic">
                 <i class="fa-solid fa-circle-check mr-2"></i>
                 Using this card maximizes your payment term.
             </p>
@@ -62,44 +62,54 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To Avoid Interest</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white divide-y divide-gray-200" id="pending-table-body">
                 {% for statement in pending_statements %}
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-bold text-gray-900">{{ statement.card.bank_name }}</div>
-                        <div class="text-xs text-gray-500">{{ statement.card.card_name }}</div>
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <div class="font-bold text-gray-900">{{ statement.card.bank_name }}</div>
+                        <div class="text-gray-500 text-xs">{{ statement.month_year|date:"F Y" }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {{ statement.month_year|date:"F Y" }}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <div class="font-medium text-gray-700">{{ statement.due_date|date:"M d, Y" }}</div>
+                        {% with days=statement.days_until_due %}
+                            {% if days is not None %}
+                                {% if days < 0 %}
+                                    <span class="text-[10px] font-bold text-red-600 uppercase">Overdue</span>
+                                {% elif days <= 3 %}
+                                    <span class="text-[10px] font-bold text-orange-500 uppercase animate-pulse">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Due in {{ days }} days!
+                                    </span>
+                                {% else %}
+                                    <span class="text-[10px] font-medium text-gray-400 uppercase italic">{{ days }} days left</span>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">
                         ${{ statement.non_interest_payment }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
-                        </span>
-                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <form action="{% url 'statements:mark_as_paid' statement.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="text-indigo-600 hover:text-indigo-900 font-bold transition">
-                                Mark as Paid
-                            </button>
-                        </form>
+                        <button 
+                            hx-post="{% url 'statements:mark_as_paid' statement.id %}" 
+                            hx-target="closest tr" 
+                            hx-swap="outerHTML swap:1s"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                            hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)"
+                            class="text-indigo-600 hover:text-indigo-900 font-bold transition">
+                            Mark as Paid
+                        </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">
-                        <i class="fa-solid fa-face-smile text-emerald-500 mr-2"></i>
-                        Great job! You have no pending payments.
+                    <td colspan="4" class="px-6 py-12 text-center text-gray-400 italic">
+                        <i class="fa-solid fa-face-smile text-emerald-500 text-xl mb-2 block"></i>
+                        No pending payments. You are up to date!
                     </td>
                 </tr>
                 {% endfor %}
@@ -110,30 +120,26 @@
     <h3 class="text-xl font-bold text-gray-700 mb-4">My Credit Cards</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for card in cards %}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group">
             <div class="flex justify-between items-start mb-4">
-                <div class="bg-indigo-50 p-3 rounded-lg text-indigo-600">
+                <div class="bg-indigo-50 p-3 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <i class="fa-solid fa-credit-card"></i>
                 </div>
-                <span class="text-xs font-bold text-gray-400">ID: {{ card.id }}</span>
+                <span class="text-[10px] font-bold text-gray-300">CARD ID: {{ card.id }}</span>
             </div>
             <h4 class="font-bold text-gray-800 text-lg">{{ card.bank_name }}</h4>
             <p class="text-gray-500 text-sm mb-4">{{ card.card_name }}</p>
             
             <div class="border-t border-gray-50 pt-4 space-y-2">
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Credit Limit:</span>
-                    <span class="font-semibold text-gray-800">${{ card.credit_limit }}</span>
+                    <span class="text-gray-400">Limit:</span>
+                    <span class="font-semibold text-gray-700">${{ card.credit_limit }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Closing Day:</span>
-                    <span class="font-medium text-indigo-600">{{ card.closing_day }}th</span>
+                    <span class="text-gray-400">Closing:</span>
+                    <span class="font-medium text-indigo-600">{{ card.closing_day }}th of month</span>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-span-full bg-white border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center text-gray-500">
-            No cards registered yet. Click "Add New Card" to begin.
         </div>
         {% endfor %}
     </div>
@@ -145,33 +151,37 @@
 <script>
     const chartOptions = { 
         maintainAspectRatio: false, 
-        cutout: '70%',
-        plugins: { legend: { position: 'bottom' } } 
+        cutout: '75%',
+        plugins: { 
+            legend: { 
+                position: 'bottom',
+                labels: { usePointStyle: true, padding: 20 }
+            } 
+        } 
     };
 
-    // Gráfica de Límites
+    // Gráfica de Límites (Distribución)
     new Chart(document.getElementById('limitsChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: {{ chart_labels|safe }},
             datasets: [{
                 data: {{ chart_limits|safe }},
-                backgroundColor: ['#4f46e5', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#84cc16'],
+                backgroundColor: ['#4f46e5', '#818cf8', '#c084fc', '#fb7185', '#34d399', '#fbbf24'],
                 borderWidth: 0
             }]
         },
         options: chartOptions
     });
 
-    // Gráfica de Salud
+    // Gráfica de Salud (Deuda vs Disponible)
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: ['Total Debt', 'Available Credit'],
             datasets: [{
                 data: {{ debt_data|safe }},
-                backgroundColor: ['#ef4444', '#10b981'],
-                hoverOffset: 4,
+                backgroundColor: ['#f43f5e', '#10b981'],
                 borderWidth: 0
             }]
         },

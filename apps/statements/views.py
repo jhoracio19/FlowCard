@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
 from cards.models import MonthlyStatement
+from django.http import HttpResponse
 
 class StatementCreateView(LoginRequiredMixin, CreateView):
     model = MonthlyStatement
@@ -25,6 +26,12 @@ class MarkAsPaidView(LoginRequiredMixin, View):
         statement = get_object_or_404(MonthlyStatement, id=pk, card__user=request.user)
         statement.is_paid = True
         statement.save()
+        
+        # Si la petición viene de HTMX, devolvemos un contenido vacío
+        if request.headers.get('HX-Request'):
+            return HttpResponse("") 
+        
+        # Si no es HTMX (fallback), redirigimos normal
         return redirect('cards:dashboard')
 
 class PaymentHistoryView(LoginRequiredMixin, ListView):

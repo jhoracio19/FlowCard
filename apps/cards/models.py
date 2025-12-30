@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 class CreditCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cards')
@@ -17,10 +18,22 @@ class CreditCard(models.Model):
 
 class MonthlyStatement(models.Model):
     card = models.ForeignKey(CreditCard, on_delete=models.CASCADE, related_name='statements')
-    month_year = models.DateField(help_text="First day of the billing month")
+    month_year = models.DateField(help_text="Mes al que corresponde este estado de cuenta")
+    
+    # --- AÑADE ESTE CAMPO ---
+    due_date = models.DateField(null=True, blank=True, help_text="Fecha límite de pago exacta")
+    
     min_payment = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     non_interest_payment = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     is_paid = models.BooleanField(default=False)
+    
+    def days_until_due(self):
+        """Calcula cuántos días faltan para la fecha de vencimiento."""
+        today = timezone.now().date()
+        if self.due_date:
+            delta = self.due_date - today
+            return delta.days
+        return None
 
     class Meta:
         unique_together = ('card', 'month_year')
