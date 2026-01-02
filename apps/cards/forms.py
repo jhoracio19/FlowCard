@@ -4,7 +4,7 @@ from .models import InstallmentPlan, CreditCard
 class CreditCardForm(forms.ModelForm):
     class Meta:
         model = CreditCard
-        fields = ['bank_name', 'card_name', 'credit_limit', 'closing_day', 'due_day']
+        fields = ['bank_name', 'card_name', 'color', 'credit_limit', 'closing_day', 'due_day']
         widgets = {
             'bank_name': forms.TextInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'Ej. BBVA'}),
             'card_name': forms.TextInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'Ej. Visa Platinum'}),

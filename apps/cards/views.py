@@ -114,13 +114,3 @@ class InstallmentPlanCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-
-class CreditCardUpdateView(LoginRequiredMixin, UpdateView):
-    model = CreditCard
-    form_class = CreditCardForm
-    template_name = 'cards/card_form.html'
-    success_url = reverse_lazy('cards:dashboard')
-
-class CreditCardDeleteView(LoginRequiredMixin, DeleteView):
-    model = CreditCard
-    success_url = reverse_lazy('cards:dashboard')

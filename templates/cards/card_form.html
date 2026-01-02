@@ -48,18 +48,17 @@
             <div class="mt-10 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-sm font-bold text-gray-600 mb-4 text-center uppercase tracking-widest">Select Card Style</p>
                 <div class="flex flex-wrap justify-center gap-4">
-                    <button type="button" onclick="updateColor('#1e40af', 'blue')" class="w-10 h-10 rounded-full bg-blue-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
-                    <button type="button" onclick="updateColor('#b91c1c', 'red')" class="w-10 h-10 rounded-full bg-red-700 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
-                    <button type="button" onclick="updateColor('#065f46', 'emerald')" class="w-10 h-10 rounded-full bg-emerald-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
-                    <button type="button" onclick="updateColor('#1f2937', 'gray')" class="w-10 h-10 rounded-full bg-gray-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
-                    <button type="button" onclick="updateColor('#78350f', 'amber')" class="w-10 h-10 rounded-full bg-amber-900 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
-                    <button type="button" onclick="updateColor('#5b21b6', 'purple')" class="w-10 h-10 rounded-full bg-purple-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#1e40af')" class="color-btn w-10 h-10 rounded-full bg-blue-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#b91c1c')" class="color-btn w-10 h-10 rounded-full bg-red-700 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#065f46')" class="color-btn w-10 h-10 rounded-full bg-emerald-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#1f2937')" class="color-btn w-10 h-10 rounded-full bg-gray-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#78350f')" class="color-btn w-10 h-10 rounded-full bg-amber-900 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
+                    <button type="button" onclick="updateColor('#5b21b6')" class="color-btn w-10 h-10 rounded-full bg-purple-800 border-4 border-white shadow-lg transform hover:scale-110 transition"></button>
                     <div class="relative w-10 h-10 rounded-full border-4 border-white shadow-lg overflow-hidden flex items-center justify-center bg-gray-100">
                         <i class="fa-solid fa-plus text-gray-400 absolute pointer-events-none"></i>
                         <input type="color" id="color-picker" oninput="updateColor(this.value)" class="absolute w-16 h-16 cursor-pointer opacity-0">
                     </div>
                 </div>
-                <input type="hidden" name="color" id="id_color" value="{{ form.instance.color|default:'#4f46e5' }}">
             </div>
         </div>
 
@@ -71,16 +70,17 @@
             
             <form method="post" id="card-form">
                 {% csrf_token %}
+                
+                <input type="hidden" name="color" id="id_color" value="{{ form.instance.color|default:'#4f46e5' }}">
+
                 <div class="space-y-6">
                     {% for field in form %}
-                        {% if field.name != 'color' %} <div>
+                        {% if field.name != 'color' %} 
+                        <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
                                 {{ field.label }}
                             </label>
                             {{ field }}
-                            {% if field.help_text %}
-                                <p class="text-[10px] text-gray-400 mt-1 italic">{{ field.help_text }}</p>
-                            {% endif %}
                             {% if field.errors %}
                                 <p class="text-red-500 text-xs mt-1 font-bold">{{ field.errors.0 }}</p>
                             {% endif %}
@@ -102,23 +102,28 @@
     </div>
 </div>
 
-
-
 <script>
-    // Referencias a los inputs del formulario generado por Django
     const bankInput = document.querySelector('input[name="bank_name"]');
     const cardNameInput = document.querySelector('input[name="card_name"]');
     const limitInput = document.querySelector('input[name="credit_limit"]');
     const colorHiddenInput = document.getElementById('id_color');
     const cardPreview = document.getElementById('card-preview');
 
-    // Función para actualizar color
-    function updateColor(color) {
-        cardPreview.style.backgroundColor = color;
-        colorHiddenInput.value = color;
-    }
+function updateColor(color) {
+    const cardPreview = document.getElementById('card-preview');
+    const colorHiddenInput = document.getElementById('id_color');
+    
+    // Cambia el fondo del preview
+    cardPreview.style.backgroundColor = color;
+    // Actualiza el valor que se enviará al backend
+    colorHiddenInput.value = color;
 
-    // Event Listeners para el Live Preview
+    // Opcional: añade un borde de "seleccionado" a los botones
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.classList.remove('ring-4', 'ring-offset-2', 'ring-black');
+    });
+}
+
     bankInput.addEventListener('input', (e) => {
         document.getElementById('preview-bank').innerText = e.target.value.toUpperCase() || 'BANK NAME';
     });
@@ -132,7 +137,6 @@
         document.getElementById('preview-limit').innerText = value.toLocaleString();
     });
 
-    // Estilo inicial de los inputs de Django para que se vean bien con Tailwind
     document.querySelectorAll('#card-form input, #card-form select').forEach(el => {
         el.classList.add('w-full', 'p-3', 'bg-gray-50', 'border', 'border-gray-200', 'rounded-xl', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:bg-white', 'transition-all', 'outline-none');
     });
