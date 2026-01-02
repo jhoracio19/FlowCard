@@ -38,6 +38,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # 3. Datos Gráfica 1 (Distribución por Banco)
         card_labels = [card.bank_name for card in user_cards]
         card_limits = [float(card.credit_limit) for card in user_cards]
+        card_colors = [str(card.color).strip() if card.color else '#4f46e5' for card in user_cards]
         
         # 4. Lógica Matemática para Gráfica 2 (Salud Financiera)
         total_limit = float(user_cards.aggregate(Sum('credit_limit'))['credit_limit__sum'] or 0)
@@ -63,6 +64,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'installment_plans': installment_plans,
             'chart_labels': json.dumps(card_labels),
             'chart_limits': json.dumps(card_limits),
+            'chart_colors': json.dumps(card_colors),
             'debt_data': json.dumps([immediate_payment, locked_credit, available_credit])
         })
         return context

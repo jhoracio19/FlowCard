@@ -159,17 +159,33 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const chartOptions = { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } } };
+    const chartOptions = { 
+        maintainAspectRatio: false, 
+        cutout: '75%', 
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { usePointStyle: true, padding: 15 } 
+            } 
+        } 
+    };
     
+    // Gráfica de Distribución de Crédito
     new Chart(document.getElementById('limitsChart').getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: {{ chart_labels|safe }},
-            datasets: [{ data: {{ chart_limits|safe }}, backgroundColor: ['#4f46e5', '#818cf8', '#c084fc', '#fb7185', '#34d399', '#fbbf24'], borderWidth: 0 }]
+            datasets: [{ 
+                data: {{ chart_limits|safe }}, 
+                // Cambiamos los colores fijos por la variable que viene de la vista
+                backgroundColor: {{ chart_colors|safe }}, 
+                borderWidth: 0 
+            }]
         },
         options: chartOptions
     });
 
+    // Gráfica de Salud Financiera (Colores fijos por semáforo de riesgo)
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
         data: {
