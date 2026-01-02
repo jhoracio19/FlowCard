@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}Add Statement - FlowCard{% endblock %}
 
 {% block content %}
@@ -13,6 +12,11 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
                 {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p class="text-red-500 text-xs mt-1 font-bold">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
             </div>
             {% endfor %}
         </div>

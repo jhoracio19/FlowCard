@@ -16,6 +16,9 @@ class CreditCard(models.Model):
 
     def __str__(self):
         return f"{self.bank_name} - {self.card_name}"
+    
+    class Meta:
+        app_label = 'cards'
 
 class MonthlyStatement(models.Model):
     card = models.ForeignKey(CreditCard, on_delete=models.CASCADE, related_name='statements')

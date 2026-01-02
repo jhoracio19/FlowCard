@@ -9,6 +9,13 @@ from django.views import View
 from django.views.generic import ListView
 from cards.models import MonthlyStatement
 from django.http import HttpResponse
+# apps/statements/views.py
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from cards.models import MonthlyStatement # <-- IMPORTANTE: Apuntar a cards
+from .forms import StatementForm
+# ... resto del archivo ...
 
 class StatementCreateView(LoginRequiredMixin, CreateView):
     model = MonthlyStatement
