@@ -1,14 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}FlowCard{% endblock %}</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/logo-touch.png' %}">
+    
     <style>
+        /* Animación suave para eliminar filas con HTMX */
         .htmx-swapping { opacity: 0; transition: opacity 1s ease-out; }
+        
+        /* Prevenir que el scroll horizontal se rompa en móviles */
+        body { overflow-x: hidden; }
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
@@ -16,14 +26,15 @@
         <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
             <a href="{% url 'cards:dashboard' %}" class="flex items-center">
                 <i class="fa-solid fa-credit-card text-indigo-600 text-2xl mr-2"></i>
-                <span class="font-bold text-xl text-gray-800">FlowCard</span>
+                <span class="font-bold text-xl text-gray-800 tracking-tight">FlowCard</span>
             </a>
             <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <span class="text-sm text-gray-600">Hi, <b>{{ user.username }}</b></span>
+                
+                    <span class="text-xs md:text-sm text-gray-600">Hi, <b>{{ user.username }}</b></span>
                     <form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
-                        <button type="submit" class="text-red-600 text-sm font-bold">Logout</button>
+                        <button type="submit" class="text-red-600 text-xs md:text-sm font-bold hover:underline">Logout</button>
                     </form>
                 {% else %}
                     <a href="{% url 'login' %}" class="text-gray-600 text-sm">Login</a>
@@ -36,16 +47,10 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-white border-t py-6 text-center text-gray-500 text-sm">
-        &copy; {% now "Y" %} FlowCard.
+    <footer class="bg-white border-t py-6 text-center text-gray-400 text-xs">
+        &copy; {% now "Y" %} FlowCard. Smart Credit Management.
     </footer>
-    {% block extra_js %}{% endblock %}
 
-    <style>
-    .htmx-swapping {
-        opacity: 0;
-        transition: opacity 1s ease-out;
-    }
-</style>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
