@@ -12,12 +12,14 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Esto permite que Django busque dentro de la carpeta 'apps'
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -137,7 +139,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-# Pon el texto directo entre comillas:
-EMAIL_HOST_USER = 'jhoracioag11@gmail.com' 
-EMAIL_HOST_PASSWORD = 'rorvopmogfwyckxz' # Sin espacios y sin os.getenv
-DEFAULT_FROM_EMAIL = 'FlowCard <jhoracioag11@gmail.com>'
+
+# os.getenv buscará en el .env (local) o en Railway (producción)
+EMAIL_HOST_USER = os.getenv('EMAIL_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD') 
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')

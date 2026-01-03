@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from datetime import date
 
 class CreditCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cards')
@@ -10,22 +11,18 @@ class CreditCard(models.Model):
     color = models.CharField(max_length=7, default="#4f46e5")
     credit_limit = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     
-    # Days of the month (1-31)
     closing_day = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(31)])
     due_day = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(31)])
 
     def __str__(self):
         return f"{self.bank_name} - {self.card_name}"
-    
-    class Meta:
-        app_label = 'cards'
 
 class MonthlyStatement(models.Model):
     card = models.ForeignKey(CreditCard, on_delete=models.CASCADE, related_name='statements')
     month_year = models.DateField(help_text="Mes al que corresponde este estado de cuenta")
     
-    # --- AÑADE ESTE CAMPO ---
-    due_date = models.DateField(null=True, blank=True, help_text="Fecha límite de pago exacta")
+    # Ponemos blank=True para que el formulario no te obligue a escribirla a mano
+    due_date = models.DateField(blank=True, help_text="Fecha límite de pago exacta")
     
     min_payment = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     non_interest_payment = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -39,8 +36,19 @@ class MonthlyStatement(models.Model):
             return delta.days
         return None
 
+    def save(self, *args, **kwargs):
+        # Auto-calculamos la fecha límite usando el día configurado en la tarjeta
+        if not self.due_date and self.card and self.month_year:
+            self.due_date = date(
+                self.month_year.year, 
+                self.month_year.month, 
+                self.card.due_day
+            )
+        super().save(*args, **kwargs)
+
     class Meta:
         unique_together = ('card', 'month_year')
+        app_label = 'cards'
 
     def __str__(self):
         return f"{self.card.card_name} - {self.month_year.strftime('%B %Y')}"

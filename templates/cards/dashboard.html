@@ -40,7 +40,7 @@
                 <p class="text-xs md:text-sm text-slate-300">
                     <span class="font-black text-white uppercase tracking-widest mr-2">Protocolo Beta:</span> 
                     Optimizando algoritmos de flujo. Reporta anomalías a 
-                    <a href="mailto:jhoracioag11@gmail.com" class="font-black text-blue-400 underline decoration-blue-800 underline-offset-4 font-bold">soporte@flowcard.com</a>.
+                    <a href="mailto:jhoracioag11@gmail.com" class="font-bold text-blue-400 underline decoration-blue-800 underline-offset-4">soporte@flowcard.com</a>.
                 </p>
             </div>
         </div>
@@ -70,7 +70,11 @@
         <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200/50 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
             <div class="relative z-10">
                 <div class="flex justify-between items-center mb-6">
-                    <span class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Próximo Vencimiento</span>
+                    <span class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                        {% with days=next_to_pay.days_until_due %}
+                            {% if days == 0 %}¡Vence Hoy!{% elif days == 1 %}Vence Mañana{% else %}Vence en {{ days }} días{% endif %}
+                        {% endwith %}
+                    </span>
                     {% with days=next_to_pay.days_until_due %}
                         {% if days <= 3 and days >= 0 %}
                             <span class="bg-red-50 text-red-600 text-[10px] px-3 py-1 rounded-full font-black animate-pulse border border-red-100 uppercase">¡Crítico!</span>
@@ -89,12 +93,12 @@
             </div>
             <div class="mt-8 flex justify-between items-end relative z-10">
                 <div>
-                    <p class="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-widest uppercase text-xs">Monto a Liquidar</p>
+                    <p class="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-widest uppercase">Monto a Liquidar</p>
                     <p class="amount-blur text-3xl font-black text-slate-900 tabular-nums transition-all duration-500">${{ next_to_pay.non_interest_payment }}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-[9px] text-red-500 uppercase font-black mb-1 tracking-widest uppercase text-xs">Fecha Límite</p>
-                    <p class="text-xl font-black text-red-600 uppercase">{{ next_to_pay.month_year|date:"d M" }}</p>
+                    <p class="text-[9px] text-red-500 uppercase font-black mb-1 tracking-widest uppercase">Fecha Límite</p>
+                    <p class="text-xl font-black text-red-600 uppercase">{{ next_to_pay.due_date|date:"d M" }}</p>
                 </div>
             </div>
         </div>
@@ -143,13 +147,13 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-1.5 h-10 rounded-full" style="background-color: {{ statement.card.color }};"></div>
                                 <div>
-                                    <div class="font-black text-slate-900 text-sm">{{ statement.card.bank_name }}</div>
+                                    <div class="font-black text-slate-900 text-sm uppercase">{{ statement.card.bank_name }}</div>
                                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ statement.month_year|date:"F Y" }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-8 py-6 whitespace-nowrap text-sm font-bold text-slate-600 uppercase">
-                            {{ statement.month_year|date:"d M, Y" }}
+                            {{ statement.due_date|date:"d M, Y" }}
                         </td>
                         <td class="px-8 py-6 whitespace-nowrap">
                             <span class="amount-blur text-sm font-black text-slate-900 tabular-nums transition-all duration-500">${{ statement.non_interest_payment }}</span>
@@ -224,7 +228,7 @@
             </div>
             
             <div class="relative z-10">
-                <h4 class="font-bold tracking-[0.3em] uppercase text-xs text-white/70 mb-6 uppercase">{{ card.card_name }}</h4>
+                <h4 class="font-bold tracking-[0.3em] uppercase text-xs text-white/70 mb-6 uppercase uppercase">{{ card.card_name }}</h4>
                 <div class="flex justify-between items-end border-t border-white/10 pt-5">
                     <div>
                         <p class="text-[8px] font-black uppercase tracking-widest text-white/50 mb-1">Línea de Crédito</p>

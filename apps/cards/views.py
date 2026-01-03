@@ -11,6 +11,7 @@ from .models import CreditCard, MonthlyStatement, InstallmentPlan
 from .services import get_best_card_to_use
 from .forms import CreditCardForm, InstallmentPlanForm
 from .forms import CustomUserRegisterForm
+from django.utils import timezone
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -22,11 +23,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # FILTRADO DE SEGURIDAD: Solo datos del usuario autenticado
         user_cards = CreditCard.objects.filter(user=self.request.user)
         
-        # Filtrar estados de cuenta pendientes del usuario
+        # 1. Ajuste de ordenamiento absoluto: 
+        # Al quitar el filtro de fechas futuras, garantizamos que si Klar vence 
+        # el 06 de enero (antes que BBVA), siempre sea el primero, 
+        # sin importar si hoy es 02, 06 o 07 de enero.
         pending_statements = MonthlyStatement.objects.filter(
             card__user=self.request.user,
             is_paid=False
-        ).order_by('due_date')
+        ).order_by('due_date') # El más antiguo/cercano siempre arriba
+
+        # 2. Selección del próximo pago (Next to Pay) simplificada:
+        # Tomamos el primero de la lista ya ordenada. 
+        # Esto prioriza automáticamente los vencidos y los de hoy.
+        next_to_pay = pending_statements.first() 
 
         # Filtrar planes MSI activos del usuario
         installment_plans = InstallmentPlan.objects.filter(
@@ -36,12 +45,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         # Lógica de Recomendación
         best_card = get_best_card_to_use(user_cards)
-        next_to_pay = pending_statements.first() 
         
         # Datos para Gráfica 1 (Distribución)
         card_labels = [card.bank_name for card in user_cards]
         card_limits = [float(card.credit_limit) for card in user_cards]
-        card_colors = [str(card.color).strip() if card.color else '#4f46e5' for card in user_cards]
+        card_colors = [str(card.color).strip() if card.color else '#0f172a' for card in user_cards]
         
         # Lógica para Gráfica 2 (Salud Financiera)
         total_limit = float(user_cards.aggregate(Sum('credit_limit'))['credit_limit__sum'] or 0)
