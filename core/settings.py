@@ -145,8 +145,9 @@ else:
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465 # Cambiamos de 587 a 465
+EMAIL_USE_TLS = False # TLS debe ser False para usar SSL
+EMAIL_USE_SSL = True # SSL debe ser True
 
 # os.getenv buscará en el .env (local) o en Railway (producción)
 EMAIL_HOST_USER = os.getenv('EMAIL_USER') 
