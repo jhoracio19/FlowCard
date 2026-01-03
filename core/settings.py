@@ -160,6 +160,9 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# 🔴 ESTO ES LO CLAVE (Railway + WhiteNoise)
+os.makedirs(STATIC_ROOT, exist_ok=True)
+
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
