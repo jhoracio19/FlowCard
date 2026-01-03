@@ -3,6 +3,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import InstallmentPlan, CreditCard
+from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class CreditCardForm(forms.ModelForm):
     class Meta:
@@ -41,12 +44,17 @@ class InstallmentPlanForm(forms.ModelForm):
         self.fields['card'].queryset = CreditCard.objects.filter(user=user)
 
 class CustomUserRegisterForm(UserCreationForm):
-    email = forms.EmailField(
-        required=True, 
-        widget=forms.EmailInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'tu@correo.com'}),
-        help_text="Requerido para enviar recordatorios de pago."
-    )
+    email = forms.EmailField(required=True, help_text="Requerido. Un correo electrónico válido.")
 
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('email',)
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Buscamos si ya existe un usuario con este correo
+        if User.objects.filter(email=email).exists():
+            raise ValidationError(
+                "Este correo electrónico ya está registrado. Por favor, utiliza otro."
+            )
+        return email

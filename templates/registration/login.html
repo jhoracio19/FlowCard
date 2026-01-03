@@ -7,7 +7,7 @@
     <div class="max-w-md w-full mx-auto bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 transform transition-all">
         
         <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-2xl mb-4 shadow-inner">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-2xl mb-4 shadow-inner border border-slate-200">
                 <i class="fa-solid fa-building-columns text-slate-800 text-3xl"></i>
             </div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Bienvenido</h1>
@@ -20,9 +20,18 @@
             <div class="space-y-5">
                 {% for field in form %}
                 <div class="group">
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-slate-700 mb-1.5 transition-colors group-focus-within:text-blue-700">
-                        {{ field.label }}
-                    </label>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-slate-700 transition-colors group-focus-within:text-blue-700">
+                            {{ field.label }}
+                        </label>
+                        
+                        {# Agregamos el enlace solo cuando el campo es el de password #}
+                        {% if "password" in field.name.lower %}
+                        <a href="{% url 'password_reset' %}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors uppercase tracking-wider">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                        {% endif %}
+                    </div>
                     
                     <div class="relative">
                         <div class="flowcard-input-wrapper">
@@ -39,8 +48,6 @@
                                 <i class="fa-solid fa-circle-user text-sm"></i>
                             {% elif "password" in field.name.lower %}
                                 <i class="fa-solid fa-key text-sm"></i>
-                            {% elif "email" in field.name.lower %}
-                                <i class="fa-solid fa-envelope text-sm"></i>
                             {% endif %}
                         </div>
                     </div>
@@ -84,22 +91,22 @@
 </div>
 
 <style>
-    /* Estilo Naval Custom */
     .flowcard-input-wrapper input {
         width: 100%;
         padding: 0.875rem 1rem;
-        background-color: #f8fafc; /* slate-50 */
-        border: 1.5px solid #e2e8f0; /* slate-200 */
+        background-color: #f8fafc;
+        border: 1.5px solid #e2e8f0;
         border-radius: 1rem;
         font-size: 0.875rem;
         transition: all 0.2s ease-in-out;
         outline: none;
-        color: #0f172a; /* slate-900 */
+        color: #0f172a;
+        padding-right: 2.5rem;
     }
 
     .flowcard-input-wrapper input:focus {
         background-color: #ffffff;
-        border-color: #1d4ed8; /* blue-700 */
+        border-color: #1d4ed8;
         box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
     }
 </style>

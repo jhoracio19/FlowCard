@@ -128,6 +128,15 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = 'cards:dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
+# settings.py
+LOGIN_REDIRECT_URL = 'cards:dashboard'
+LOGOUT_REDIRECT_URL = 'login'
+
+# Esto es para que el correo de recuperación use el protocolo correcto
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Verás el link en la terminal
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Configuración de Email (Ejemplo con Gmail)
 # core/settings.py
