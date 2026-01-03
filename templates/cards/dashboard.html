@@ -7,6 +7,10 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Insights</h1>
         <div class="flex gap-2">
+            <button id="privacyBtn" onclick="togglePrivacy()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shadow-sm border border-gray-200">
+                <i class="fa-solid fa-eye text-sm"></i>
+            </button>
+            
             <a href="{% url 'statements:add' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm text-sm">
                 <i class="fa-solid fa-file-invoice-dollar mr-1"></i> + Add Statement
             </a>
@@ -57,7 +61,7 @@
             <div class="mt-4 flex justify-between items-end">
                 <div>
                     <p class="text-[9px] text-gray-400 uppercase font-black mb-0.5">Amount to pay</p>
-                    <p class="text-2xl font-black text-gray-900 leading-none">${{ next_to_pay.non_interest_payment }}</p>
+                    <p class="amount-blur text-2xl font-black text-gray-900 leading-none transition-all duration-300">${{ next_to_pay.non_interest_payment }}</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] text-gray-400 uppercase font-black mb-0.5 text-red-500">Due Date</p>
@@ -65,14 +69,6 @@
                 </div>
             </div>
             <i class="fa-solid fa-calendar-check absolute -right-4 -bottom-4 text-8xl text-gray-50 pointer-events-none"></i>
-        </div>
-        {% else %}
-        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-inner">
-            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
-                <i class="fa-solid fa-check text-emerald-600 text-xl"></i>
-            </div>
-            <p class="text-emerald-800 font-black text-sm uppercase tracking-tight">¡Estás al día!</p>
-            <p class="text-emerald-600 text-[10px] font-medium mt-1">No tienes pagos pendientes próximamente.</p>
         </div>
         {% endif %}
     </div>
@@ -114,22 +110,11 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-bold text-gray-700">{{ statement.month_year|date:"M d, Y" }}</div>
-                        {% with days=statement.days_until_due %}
-                            {% if days is not None %}
-                                {% if days < 0 %}
-                                    <span class="text-[9px] font-black text-red-600 uppercase italic">Vencido</span>
-                                {% elif days <= 3 %}
-                                    <span class="text-[9px] font-black text-orange-500 uppercase animate-pulse italic">¡En {{ days }} días!</span>
-                                {% else %}
-                                    <span class="text-[9px] font-bold text-gray-300 uppercase">{{ days }} días restantes</span>
-                                {% endif %}
-                            {% endif %}
-                        {% endwith %}
+                    <td class="px-6 py-4 text-sm font-bold text-gray-700">
+                        {{ statement.month_year|date:"M d, Y" }}
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-sm font-black text-gray-900">${{ statement.non_interest_payment }}</span>
+                        <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ statement.non_interest_payment }}</span>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" 
@@ -142,8 +127,6 @@
                         </button>
                     </td>
                 </tr>
-                {% empty %}
-                <tr><td colspan="4" class="px-6 py-10 text-center text-gray-400 text-xs italic font-medium">No hay pagos pendientes registrados.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -155,18 +138,26 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {% for plan in installment_plans %}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group">
+            
+            <form action="{% url 'cards:plan_delete' plan.id %}" method="post" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('¿Liquidar este plan manualmente?');">
+                {% csrf_token %}
+                <button type="submit" class="text-gray-300 hover:text-red-500 p-1">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                </button>
+            </form>
+
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-start gap-3">
                     <div class="w-1 h-10 rounded-full" style="background-color: {{ plan.card.color }};"></div>
                     <div>
                         <h4 class="font-bold text-gray-800 text-sm">{{ plan.name }}</h4>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-50 text-emerald-600{% else %}bg-amber-50 text-amber-600{% endif %} font-black uppercase tracking-tighter">{{ plan.get_type_display }}</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-50 text-emerald-600{% else %}bg-amber-50 text-amber-600{% endif %} font-black uppercase">{{ plan.get_type_display }}</span>
                     </div>
                 </div>
-                <div class="text-right">
-                    <span class="text-sm font-black text-gray-900">${{ plan.monthly_payment }}</span>
-                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">/ Mes</p>
+                <div class="text-right pr-6">
+                    <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ plan.monthly_payment }}</span>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase">/ Mes</p>
                 </div>
             </div>
             <div class="space-y-2 mt-4">
@@ -175,7 +166,7 @@
                     <span class="text-indigo-600">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
                 </div>
                 <div class="w-full bg-gray-50 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-1000" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
+                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
                 </div>
             </div>
         </div>
@@ -185,31 +176,29 @@
     <div class="px-2 mb-6">
         <h3 class="text-lg font-black text-gray-700">My Credit Cards</h3>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {% for card in cards %}
-        <div class="rounded-3xl p-6 text-white shadow-xl transition transform hover:-translate-y-2 relative overflow-hidden h-48 flex flex-col justify-between" style="background-color: {{ card.color|default:'#4f46e5' }};">
+        <div class="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden h-48 flex flex-col justify-between" style="background-color: {{ card.color|default:'#4f46e5' }};">
             <div class="relative z-10 flex justify-between items-start">
                 <span class="font-black text-xl italic tracking-tighter">{{ card.bank_name }}</span>
                 <div class="flex space-x-1.5">
-                    <a href="{% url 'cards:card_edit' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-white/40 transition-all backdrop-blur-sm"><i class="fa-solid fa-pen text-[10px]"></i></a>
-                    <a href="{% url 'cards:card_delete' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-red-500 transition-all backdrop-blur-sm"><i class="fa-solid fa-trash text-[10px]"></i></a>
+                    <a href="{% url 'cards:card_edit' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-white/40"><i class="fa-solid fa-pen text-[10px]"></i></a>
+                    <a href="{% url 'cards:card_delete' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-red-500"><i class="fa-solid fa-trash text-[10px]"></i></a>
                 </div>
             </div>
-            
             <div class="relative z-10">
                 <h4 class="font-black tracking-[0.2em] uppercase text-xs opacity-90 mb-4">{{ card.card_name }}</h4>
                 <div class="flex justify-between items-end border-t border-white/10 pt-4">
                     <div>
-                        <p class="text-[8px] font-black uppercase opacity-60 tracking-widest">Credit Limit</p>
-                        <p class="text-sm font-black">${{ card.credit_limit }}</p>
+                        <p class="text-[8px] font-black uppercase opacity-60">Credit Limit</p>
+                        <p class="amount-blur text-sm font-black transition-all duration-300">${{ card.credit_limit }}</p>
                     </div>
-                    <div class="bg-black/20 px-3 py-1.5 rounded-xl backdrop-blur-md">
+                    <div class="bg-black/20 px-3 py-1.5 rounded-xl">
                         <p class="text-[8px] font-black uppercase opacity-60 leading-none">Corte</p>
                         <p class="text-[11px] font-black italic">{{ card.closing_day }}th</p>
                     </div>
                 </div>
             </div>
-            <i class="fa-solid fa-bolt-lightning absolute -right-4 -bottom-4 text-9xl text-white opacity-10 rotate-12"></i>
         </div>
         {% endfor %}
     </div>
@@ -219,51 +208,48 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // --- LÓGICA DE PRIVACIDAD ---
+    function togglePrivacy() {
+        const amounts = document.querySelectorAll('.amount-blur');
+        const btn = document.getElementById('privacyBtn');
+        const icon = btn.querySelector('i');
+        
+        amounts.forEach(el => {
+            el.classList.toggle('blur-md');
+            el.classList.toggle('select-none'); // Evita que copien el texto mientras está oculto
+        });
+
+        if (icon.classList.contains('fa-eye')) {
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+            localStorage.setItem('privacyMode', 'on');
+        } else {
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+            localStorage.setItem('privacyMode', 'off');
+        }
+    }
+
+    // Persistencia del estado al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('privacyMode') === 'on') {
+            togglePrivacy();
+        }
+    });
+
+    // --- GRÁFICAS ---
     const chartOptions = { 
-        maintainAspectRatio: false, 
-        cutout: '78%', 
-        plugins: { 
-            legend: { 
-                position: 'bottom', 
-                labels: { 
-                    usePointStyle: true, 
-                    pointStyle: 'circle',
-                    padding: 20,
-                    font: { size: 10, weight: '700' },
-                    color: '#9ca3af'
-                } 
-            } 
-        },
-        animation: { duration: 2000, easing: 'easeOutQuart' }
+        maintainAspectRatio: false, cutout: '78%', 
+        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 10, weight: '700' }, color: '#9ca3af' } } }
     };
     
-    // Distribución de Crédito
     new Chart(document.getElementById('limitsChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-            labels: {{ chart_labels|safe }},
-            datasets: [{ 
-                data: {{ chart_limits|safe }}, 
-                backgroundColor: {{ chart_colors|safe }}, 
-                borderWidth: 0,
-                hoverOffset: 15
-            }]
-        },
+        data: { labels: {{ chart_labels|safe }}, datasets: [{ data: {{ chart_limits|safe }}, backgroundColor: {{ chart_colors|safe }}, borderWidth: 0 }] },
         options: chartOptions
     });
 
-    // Salud Financiera
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-            labels: ['Due This Month', 'Locked (MSI)', 'Available Credit'],
-            datasets: [{ 
-                data: {{ debt_data|safe }}, 
-                backgroundColor: ['#f43f5e', '#9ca3af', '#10b981'], 
-                borderWidth: 0,
-                hoverOffset: 15
-            }]
-        },
+        data: { labels: ['Due This Month', 'Locked (MSI)', 'Available Credit'], datasets: [{ data: {{ debt_data|safe }}, backgroundColor: ['#f43f5e', '#9ca3af', '#10b981'], borderWidth: 0 }] },
         options: chartOptions
     });
 </script>

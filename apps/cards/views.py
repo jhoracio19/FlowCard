@@ -11,6 +11,9 @@ from .models import CreditCard, MonthlyStatement, InstallmentPlan
 from .services import get_best_card_to_use
 from .forms import CreditCardForm, InstallmentPlanForm
 from django.views.generic import UpdateView, DeleteView
+from django.views import View
+from django.shortcuts import get_object_or_404, redirect
+from .models import InstallmentPlan
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'cards/dashboard.html'
@@ -116,3 +119,10 @@ class InstallmentPlanCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+
+class InstallmentPlanDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        # Buscamos el plan asegurándonos que pertenezca al usuario logueado
+        plan = get_object_or_404(InstallmentPlan, id=pk, card__user=request.user)
+        plan.delete()
+        return redirect('cards:dashboard')
