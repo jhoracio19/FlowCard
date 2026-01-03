@@ -10,6 +10,7 @@ from django.views import View
 from .models import CreditCard, MonthlyStatement, InstallmentPlan
 from .services import get_best_card_to_use
 from .forms import CreditCardForm, InstallmentPlanForm
+from .forms import CustomUserRegisterForm
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'cards/dashboard.html'
@@ -115,7 +116,8 @@ class InstallmentPlanDeleteView(LoginRequiredMixin, View):
         plan.delete()
         return redirect('cards:dashboard')
 
+
 class RegisterView(CreateView):
-    form_class = UserCreationForm
+    form_class = CustomUserRegisterForm # Cambiamos UserCreationForm por el tuyo
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
