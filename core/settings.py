@@ -166,3 +166,11 @@ os.makedirs(STATIC_ROOT, exist_ok=True)
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+
+# core/settings.py
+
+# Añade esta línea al final
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-a45a4.up.railway.app',
+    'https://*.railway.app'
+]
