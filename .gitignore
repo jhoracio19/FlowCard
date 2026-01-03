@@ -27,3 +27,8 @@ Thumbs.db
 
 # Variables de entorno
 .env
+*.pyc
+*__pycache__*
+db.sqlite3
+venv/
+.env

@@ -3,20 +3,37 @@
 {% block title %}Dashboard - FlowCard{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Insights</h1>
-        <div class="flex gap-2">
-            <button id="privacyBtn" onclick="togglePrivacy()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shadow-sm border border-gray-200">
+<div class="max-w-6xl mx-auto px-2 md:px-0">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">Insights</h1>
+        
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+            <button id="privacyBtn" onclick="togglePrivacy()" class="flex-shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shadow-sm border border-gray-200">
                 <i class="fa-solid fa-eye text-sm"></i>
             </button>
             
-            <a href="{% url 'statements:add' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm text-sm">
-                <i class="fa-solid fa-file-invoice-dollar mr-1"></i> + Add Statement
+            <a href="{% url 'statements:add' %}" class="flex-shrink-0 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium transition shadow-sm text-xs md:text-sm">
+                <i class="fa-solid fa-file-invoice-dollar mr-1"></i> + Statement
             </a>
-            <a href="{% url 'cards:card_add' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm text-sm">
-                <i class="fa-solid fa-credit-card mr-1"></i> + Add New Card
+            
+            <a href="{% url 'cards:card_add' %}" class="flex-shrink-0 whitespace-nowrap bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium transition shadow-sm text-xs md:text-sm">
+                <i class="fa-solid fa-credit-card mr-1"></i> + New Card
             </a>
+        </div>
+    </div>
+
+    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-8 rounded-r-xl shadow-sm">
+        <div class="flex items-start md:items-center">
+            <div class="flex-shrink-0">
+                <i class="fa-solid fa-flask text-indigo-600 animate-pulse text-sm"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-[11px] md:text-sm text-indigo-700 leading-relaxed">
+                    <span class="font-bold uppercase tracking-tight">FlowCard Beta:</span> 
+                    Estamos en pruebas. Reporta errores a 
+                    <a href="mailto:tu-correo@ejemplo.com" class="font-black underline decoration-indigo-300 underline-offset-2">este correo</a>.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -26,7 +43,7 @@
             <div class="relative z-10">
                 <h2 class="text-indigo-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Best to use today</h2>
                 <div class="mt-4">
-                    <span class="text-3xl font-black block">{{ best_card.bank_name }}</span>
+                    <span class="text-3xl font-black block leading-none">{{ best_card.bank_name }}</span>
                     <span class="text-lg opacity-90">{{ best_card.card_name }}</span>
                 </div>
             </div>
@@ -48,7 +65,6 @@
                         {% endif %}
                     {% endwith %}
                 </div>
-                
                 <div class="flex items-center gap-4">
                     <div class="w-1.5 h-10 rounded-full" style="background-color: {{ next_to_pay.card.color }};"></div>
                     <div>
@@ -57,7 +73,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mt-4 flex justify-between items-end">
                 <div>
                     <p class="text-[9px] text-gray-400 uppercase font-black mb-0.5">Amount to pay</p>
@@ -68,7 +83,14 @@
                     <p class="text-lg font-black text-red-600 leading-none">{{ next_to_pay.due_date|date:"M d" }}</p>
                 </div>
             </div>
-            <i class="fa-solid fa-calendar-check absolute -right-4 -bottom-4 text-8xl text-gray-50 pointer-events-none"></i>
+        </div>
+        {% else %}
+        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-inner min-h-[160px]">
+            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                <i class="fa-solid fa-check text-emerald-600 text-xl"></i>
+            </div>
+            <p class="text-emerald-800 font-black text-sm uppercase tracking-tight">¡Estás al día!</p>
+            <p class="text-emerald-600 text-[10px] font-medium mt-1">No tienes pagos pendientes registrados.</p>
         </div>
         {% endif %}
     </div>
@@ -89,47 +111,46 @@
         <a href="{% url 'statements:history' %}" class="text-[10px] text-indigo-600 font-bold uppercase hover:underline">View History →</a>
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Card</th>
-                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Date</th>
-                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount</th>
-                    <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-                {% for statement in pending_statements %}
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-1 h-8 rounded-full" style="background-color: {{ statement.card.color }};"></div>
-                            <div>
-                                <div class="font-bold text-gray-900 text-sm">{{ statement.card.bank_name }}</div>
-                                <div class="text-[10px] text-gray-400 font-bold">{{ statement.month_year|date:"F Y" }}</div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Card</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Date</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount</th>
+                        <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    {% for statement in pending_statements %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="w-1 h-8 rounded-full" style="background-color: {{ statement.card.color }};"></div>
+                                <div>
+                                    <div class="font-bold text-gray-900 text-sm">{{ statement.card.bank_name }}</div>
+                                    <div class="text-[10px] text-gray-400 font-bold">{{ statement.month_year|date:"F Y" }}</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm font-bold text-gray-700">
-                        {{ statement.month_year|date:"M d, Y" }}
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ statement.non_interest_payment }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" 
-                                hx-target="closest tr" 
-                                hx-swap="outerHTML swap:1s" 
-                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                                hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)" 
-                                class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black hover:bg-indigo-600 hover:text-white transition-all uppercase">
-                            Paid
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">
+                            {{ statement.month_year|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ statement.non_interest_payment }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" hx-target="closest tr" hx-swap="outerHTML swap:1s" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black hover:bg-indigo-600 hover:text-white transition-all uppercase">
+                                Paid
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="px-6 py-10 text-center text-gray-400 text-xs italic font-medium">No hay pagos pendientes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="flex justify-between items-center mb-6 px-2">
@@ -139,20 +160,18 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {% for plan in installment_plans %}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group">
-            
             <form action="{% url 'cards:plan_delete' plan.id %}" method="post" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('¿Liquidar este plan manualmente?');">
                 {% csrf_token %}
                 <button type="submit" class="text-gray-300 hover:text-red-500 p-1">
                     <i class="fa-solid fa-trash-can text-[10px]"></i>
                 </button>
             </form>
-
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-start gap-3">
                     <div class="w-1 h-10 rounded-full" style="background-color: {{ plan.card.color }};"></div>
                     <div>
-                        <h4 class="font-bold text-gray-800 text-sm">{{ plan.name }}</h4>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-50 text-emerald-600{% else %}bg-amber-50 text-amber-600{% endif %} font-black uppercase">{{ plan.get_type_display }}</span>
+                        <h4 class="font-bold text-gray-800 text-sm truncate max-w-[120px]">{{ plan.name }}</h4>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-50 text-emerald-600{% else %}bg-amber-50 text-amber-600{% endif %} font-black uppercase tracking-tighter">{{ plan.get_type_display }}</span>
                     </div>
                 </div>
                 <div class="text-right pr-6">
@@ -166,16 +185,14 @@
                     <span class="text-indigo-600">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
                 </div>
                 <div class="w-full bg-gray-50 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
+                    <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-1000" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <div class="px-2 mb-6">
-        <h3 class="text-lg font-black text-gray-700">My Credit Cards</h3>
-    </div>
+    <div class="px-2 mb-6 text-lg font-black text-gray-700">My Credit Cards</div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {% for card in cards %}
         <div class="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden h-48 flex flex-col justify-between" style="background-color: {{ card.color|default:'#4f46e5' }};">
@@ -190,7 +207,7 @@
                 <h4 class="font-black tracking-[0.2em] uppercase text-xs opacity-90 mb-4">{{ card.card_name }}</h4>
                 <div class="flex justify-between items-end border-t border-white/10 pt-4">
                     <div>
-                        <p class="text-[8px] font-black uppercase opacity-60">Credit Limit</p>
+                        <p class="text-[8px] font-black uppercase opacity-60">Limit</p>
                         <p class="amount-blur text-sm font-black transition-all duration-300">${{ card.credit_limit }}</p>
                     </div>
                     <div class="bg-black/20 px-3 py-1.5 rounded-xl">
@@ -208,17 +225,11 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // --- LÓGICA DE PRIVACIDAD ---
     function togglePrivacy() {
         const amounts = document.querySelectorAll('.amount-blur');
         const btn = document.getElementById('privacyBtn');
         const icon = btn.querySelector('i');
-        
-        amounts.forEach(el => {
-            el.classList.toggle('blur-md');
-            el.classList.toggle('select-none'); // Evita que copien el texto mientras está oculto
-        });
-
+        amounts.forEach(el => { el.classList.toggle('blur-md'); el.classList.toggle('select-none'); });
         if (icon.classList.contains('fa-eye')) {
             icon.classList.replace('fa-eye', 'fa-eye-slash');
             localStorage.setItem('privacyMode', 'on');
@@ -228,14 +239,10 @@
         }
     }
 
-    // Persistencia del estado al cargar
     document.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('privacyMode') === 'on') {
-            togglePrivacy();
-        }
+        if (localStorage.getItem('privacyMode') === 'on') { togglePrivacy(); }
     });
 
-    // --- GRÁFICAS ---
     const chartOptions = { 
         maintainAspectRatio: false, cutout: '78%', 
         plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 10, weight: '700' }, color: '#9ca3af' } } }
