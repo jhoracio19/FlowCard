@@ -174,3 +174,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://web-production-a45a4.up.railway.app',
     'https://*.railway.app'
 ]
+# settings.py
+
+# Esto ayuda a Safari a entender que el sitio es de confianza y seguro
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
