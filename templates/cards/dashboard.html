@@ -115,7 +115,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm font-bold text-gray-700">{{ statement.due_date|date:"M d, Y" }}</div>
+                        <div class="text-sm font-bold text-gray-700">{{ statement.month_year|date:"M d, Y" }}</div>
                         {% with days=statement.days_until_due %}
                             {% if days is not None %}
                                 {% if days < 0 %}
