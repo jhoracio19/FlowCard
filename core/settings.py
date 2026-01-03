@@ -126,7 +126,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
 
 LOGIN_REDIRECT_URL = 'cards:dashboard'
 LOGOUT_REDIRECT_URL = 'login'
@@ -134,12 +133,6 @@ LOGIN_URL = 'login'
 # settings.py
 LOGIN_REDIRECT_URL = 'cards:dashboard'
 LOGOUT_REDIRECT_URL = 'login'
-
-# Al final de settings.py
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Esto es para que el correo de recuperación use el protocolo correcto
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Verás el link en la terminal
@@ -147,8 +140,6 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Configuración de Email (Ejemplo con Gmail)
-# core/settings.py
-import os
 
 # core/settings.py
 
@@ -162,9 +153,11 @@ EMAIL_HOST_USER = os.getenv('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD') 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
-# Al final de core/settings.py
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Esta carpeta es la que busca el log
+# =========================
+# STATIC FILES (PRODUCCIÓN)
+# =========================
 
-# Esto es lo que permite que WhiteNoise funcione sin errores
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
