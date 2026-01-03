@@ -12,6 +12,7 @@ from .services import get_best_card_to_use
 from .forms import CreditCardForm, InstallmentPlanForm
 from .forms import CustomUserRegisterForm
 
+
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'cards/dashboard.html'
 
@@ -118,6 +119,15 @@ class InstallmentPlanDeleteView(LoginRequiredMixin, View):
 
 
 class RegisterView(CreateView):
-    form_class = CustomUserRegisterForm # Cambiamos UserCreationForm por el tuyo
+    form_class = CustomUserRegisterForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        # Guardamos el usuario pero sin enviarlo a la DB todavía (commit=False)
+        user = form.save(commit=False)
+        # Asignamos el email validado del formulario al campo email del modelo User
+        user.email = form.cleaned_data['email']
+        # Guardamos definitivamente
+        user.save()
+        return super().form_valid(form)

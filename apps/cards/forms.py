@@ -11,7 +11,6 @@ class CreditCardForm(forms.ModelForm):
         widgets = {
             'bank_name': forms.TextInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'Ej. BBVA'}),
             'card_name': forms.TextInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'Ej. Oro'}),
-            # CAMBIO AQUÍ: Usamos TextInput y forzamos el type="color" en los atributos
             'color': forms.TextInput(attrs={'type': 'color', 'class': 'w-full h-10 border rounded-lg cursor-pointer'}),
             'credit_limit': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg'}),
             'closing_day': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded-lg', 'min': 1, 'max': 31}),
@@ -39,7 +38,6 @@ class InstallmentPlanForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filtro de seguridad: solo tarjetas del usuario actual
         self.fields['card'].queryset = CreditCard.objects.filter(user=user)
 
 class CustomUserRegisterForm(UserCreationForm):

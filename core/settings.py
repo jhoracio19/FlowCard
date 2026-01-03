@@ -126,3 +126,18 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = 'cards:dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
+
+# Configuración de Email (Ejemplo con Gmail)
+# core/settings.py
+import os
+
+# core/settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# Pon el texto directo entre comillas:
+EMAIL_HOST_USER = 'jhoracioag11@gmail.com' 
+EMAIL_HOST_PASSWORD = 'rorvopmogfwyckxz' # Sin espacios y sin os.getenv
+DEFAULT_FROM_EMAIL = 'FlowCard <jhoracioag11@gmail.com>'
