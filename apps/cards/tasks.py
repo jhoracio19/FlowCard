@@ -4,19 +4,19 @@ from django.core.mail import send_mail
 from .models import MonthlyStatement
 
 def send_payment_reminders():
-    # 1. Definimos el rango de tiempo (3 días para capturar el 5 de enero si hoy es 2)
+    # 1. Definimos la fecha objetivo (ej. hoy + 3 días)
     today = timezone.now().date()
-    target_date = today + timedelta(days=2)
+    target_date = today + timedelta(days=3)
 
-    print(f"DEBUG: Buscando pagos para la fecha: {target_date}")
+    print(f"DEBUG: Buscando pagos que vencen el: {target_date}")
 
-    # 2. Buscamos statements pendientes con fecha exacta y no pagados
+    # 2. Filtramos por el campo 'month_year' que es donde guardas la fecha
     upcoming_payments = MonthlyStatement.objects.filter(
-        due_date=target_date,
+        month_year=target_date,  # <-- CAMBIO AQUÍ
         is_paid=False
     )
 
-    print(f"DEBUG: Se encontraron {upcoming_payments.count()} registros coincidentes.")
+    print(f"DEBUG: Se encontraron {upcoming_payments.count()} recordatorios.")
 
     sent_count = 0
     for statement in upcoming_payments:
@@ -26,19 +26,17 @@ def send_payment_reminders():
             message = (
                 f'Hola {user.username},\n\n'
                 f'Te recordamos que el pago de tu tarjeta {statement.card.card_name} '
-                f'por un monto de ${statement.non_interest_payment} vence el {statement.due_date}.\n\n'
+                f'por un monto de ${statement.non_interest_payment} vence el {statement.month_year}.\n\n'
                 f'¡Evita recargos pagando a tiempo!'
             )
             
-            # El remitente debe ser el mismo configurado en EMAIL_HOST_USER
             send_mail(
                 subject,
                 message,
-                'jhoracioag11@gmail.com', # Asegúrate de que este sea tu EMAIL_HOST_USER
+                'jhoracioag11@gmail.com',
                 [user.email],
                 fail_silently=False,
             )
             sent_count += 1
-            print(f"DEBUG: Correo enviado a {user.email}")
             
     return f"Se enviaron {sent_count} recordatorios."
