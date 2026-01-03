@@ -1,218 +1,238 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - FlowCard{% endblock %}
+{% block title %}Insights - FlowCard{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-2 md:px-0">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">Insights</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <div class="flex flex-col gap-6 mb-10">
+        <div class="flex justify-between items-start md:items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Panel de Control</h1>
+                <p class="text-slate-500 font-medium italic mt-1 text-sm md:text-base">Estrategia y salud de tus líneas de crédito.</p>
+            </div>
+        </div>
         
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-            <button id="privacyBtn" onclick="togglePrivacy()" class="flex-shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shadow-sm border border-gray-200">
+        <div class="flex items-center gap-2 md:gap-3 w-full overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+            <button id="privacyBtn" onclick="togglePrivacy()" 
+                    class="flex-shrink-0 h-11 w-11 flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600 rounded-xl transition shadow-sm border border-slate-200 active:scale-90">
                 <i class="fa-solid fa-eye text-sm"></i>
             </button>
             
-            <a href="{% url 'statements:add' %}" class="flex-shrink-0 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium transition shadow-sm text-xs md:text-sm">
-                <i class="fa-solid fa-file-invoice-dollar mr-1"></i> + Statement
+            <a href="{% url 'statements:add' %}" 
+               class="flex-1 md:flex-none flex-shrink-0 whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-900 px-4 py-2.5 rounded-xl font-black transition text-[10px] md:text-xs uppercase tracking-widest border border-slate-200 text-center">
+                <i class="fa-solid fa-file-invoice-dollar mr-1 md:mr-2"></i> + Estado
             </a>
             
-            <a href="{% url 'cards:card_add' %}" class="flex-shrink-0 whitespace-nowrap bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-medium transition shadow-sm text-xs md:text-sm">
-                <i class="fa-solid fa-credit-card mr-1"></i> + New Card
+            <a href="{% url 'cards:card_add' %}" 
+               class="flex-[1.5] md:flex-none flex-shrink-0 whitespace-nowrap bg-slate-900 hover:bg-blue-900 text-white px-4 py-2.5 rounded-xl font-black transition shadow-xl shadow-slate-200 text-[10px] md:text-xs uppercase tracking-widest text-center">
+                <i class="fa-solid fa-credit-card mr-1 md:mr-2 text-blue-400"></i> + Nueva Tarjeta
             </a>
         </div>
     </div>
 
-    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-8 rounded-r-xl shadow-sm">
-        <div class="flex items-start md:items-center">
-            <div class="flex-shrink-0">
-                <i class="fa-solid fa-flask text-indigo-600 animate-pulse text-sm"></i>
+    <div class="bg-slate-900 border-l-4 border-blue-600 p-5 mb-10 rounded-2xl shadow-xl overflow-hidden relative">
+        <div class="flex items-center relative z-10">
+            <div class="flex-shrink-0 w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-flask-vial text-blue-400 animate-pulse"></i>
             </div>
-            <div class="ml-3">
-                <p class="text-[11px] md:text-sm text-indigo-700 leading-relaxed">
-                    <span class="font-bold uppercase tracking-tight">FlowCard Beta:</span> 
-                    Estamos en pruebas. Reporta errores a 
-                    <a href="mailto:tu-correo@ejemplo.com" class="font-black underline decoration-indigo-300 underline-offset-2">este correo</a>.
+            <div class="ml-4">
+                <p class="text-xs md:text-sm text-slate-300">
+                    <span class="font-black text-white uppercase tracking-widest mr-2">Protocolo Beta:</span> 
+                    Optimizando algoritmos de flujo. Reporta anomalías a 
+                    <a href="mailto:jhoracioag11@gmail.com" class="font-black text-blue-400 underline decoration-blue-800 underline-offset-4 font-bold">soporte@flowcard.com</a>.
                 </p>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {% if best_card %}
-        <div class="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl min-h-[160px] flex flex-col justify-between">
+        <div class="group relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl flex flex-col justify-between min-h-[220px] transform transition-transform hover:scale-[1.01]">
+            <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600/20 rounded-full -mr-20 -mt-20 blur-3xl"></div>
             <div class="relative z-10">
-                <h2 class="text-indigo-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Best to use today</h2>
-                <div class="mt-4">
-                    <span class="text-3xl font-black block leading-none">{{ best_card.bank_name }}</span>
-                    <span class="text-lg opacity-90">{{ best_card.card_name }}</span>
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="bg-blue-600 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full">Recomendación de Uso</span>
+                </div>
+                <div>
+                    <span class="text-4xl font-black block leading-none italic tracking-tighter uppercase">{{ best_card.bank_name }}</span>
+                    <span class="text-lg text-slate-400 font-medium uppercase tracking-[0.3em] mt-2 block">{{ best_card.card_name }}</span>
                 </div>
             </div>
-            <p class="relative z-10 mt-4 text-[11px] italic flex items-center bg-white/10 w-fit px-3 py-1 rounded-full">
-                <i class="fa-solid fa-circle-check mr-2 text-emerald-400"></i> Maximiza tu fecha de pago.
-            </p>
-            <i class="fa-solid fa-bolt absolute -right-2 -bottom-2 text-8xl text-white opacity-10"></i>
+            <div class="relative z-10 flex items-center bg-white/5 border border-white/10 w-fit px-4 py-2 rounded-2xl backdrop-blur-md">
+                <i class="fa-solid fa-calendar-star mr-3 text-blue-400 text-sm"></i>
+                <p class="text-xs font-bold text-slate-200">Máximo financiamiento disponible hoy.</p>
+            </div>
         </div>
         {% endif %}
 
         {% if next_to_pay %}
-        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-            <div>
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Next Payment Due</h2>
+        <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200/50 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Próximo Vencimiento</span>
                     {% with days=next_to_pay.days_until_due %}
                         {% if days <= 3 and days >= 0 %}
-                            <span class="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">¡URGENTE!</span>
+                            <span class="bg-red-50 text-red-600 text-[10px] px-3 py-1 rounded-full font-black animate-pulse border border-red-100 uppercase">¡Crítico!</span>
                         {% endif %}
                     {% endwith %}
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="w-1.5 h-10 rounded-full" style="background-color: {{ next_to_pay.card.color }};"></div>
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black shadow-lg" style="background-color: {{ next_to_pay.card.color }};">
+                        {{ next_to_pay.card.bank_name|slice:":1" }}
+                    </div>
                     <div>
-                        <span class="text-2xl font-black block text-gray-800 leading-tight">{{ next_to_pay.card.bank_name }}</span>
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-tighter">{{ next_to_pay.card.card_name }}</span>
+                        <span class="text-2xl font-black block text-slate-900 tracking-tight uppercase">{{ next_to_pay.card.bank_name }}</span>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">{{ next_to_pay.card.card_name }}</span>
                     </div>
                 </div>
             </div>
-            <div class="mt-4 flex justify-between items-end">
+            <div class="mt-8 flex justify-between items-end relative z-10">
                 <div>
-                    <p class="text-[9px] text-gray-400 uppercase font-black mb-0.5">Amount to pay</p>
-                    <p class="amount-blur text-2xl font-black text-gray-900 leading-none transition-all duration-300">${{ next_to_pay.non_interest_payment }}</p>
+                    <p class="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-widest uppercase text-xs">Monto a Liquidar</p>
+                    <p class="amount-blur text-3xl font-black text-slate-900 tabular-nums transition-all duration-500">${{ next_to_pay.non_interest_payment }}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-[9px] text-gray-400 uppercase font-black mb-0.5 text-red-500">Due Date</p>
-                    <p class="text-lg font-black text-red-600 leading-none">{{ next_to_pay.due_date|date:"M d" }}</p>
+                    <p class="text-[9px] text-red-500 uppercase font-black mb-1 tracking-widest uppercase text-xs">Fecha Límite</p>
+                    <p class="text-xl font-black text-red-600 uppercase">{{ next_to_pay.month_year|date:"d M" }}</p>
                 </div>
             </div>
         </div>
         {% else %}
-        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-inner min-h-[160px]">
-            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
-                <i class="fa-solid fa-check text-emerald-600 text-xl"></i>
+        <div class="bg-slate-50 border border-dashed border-slate-200 rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center min-h-[220px]">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <i class="fa-solid fa-check text-emerald-500 text-xl"></i>
             </div>
-            <p class="text-emerald-800 font-black text-sm uppercase tracking-tight">¡Estás al día!</p>
-            <p class="text-emerald-600 text-[10px] font-medium mt-1">No tienes pagos pendientes registrados.</p>
+            <p class="text-slate-900 font-black text-xs uppercase tracking-widest">Todo en orden</p>
+            <p class="text-slate-400 text-[10px] mt-1 italic">No tienes estados de cuenta pendientes.</p>
         </div>
         {% endif %}
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="text-sm font-bold text-gray-500 mb-6 text-center uppercase tracking-widest">Credit Distribution</h3>
-            <div class="h-64"><canvas id="limitsChart"></canvas></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-50 flex flex-col">
+            <h3 class="text-[11px] font-black text-slate-400 mb-8 text-center uppercase tracking-[0.4em]">Distribución de Líneas</h3>
+            <div class="flex-grow h-64"><canvas id="limitsChart"></canvas></div>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="text-sm font-bold text-gray-500 mb-6 text-center uppercase tracking-widest">Overall Credit Health</h3>
-            <div class="h-64"><canvas id="healthChart"></canvas></div>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-50 flex flex-col">
+            <h3 class="text-[11px] font-black text-slate-400 mb-8 text-center uppercase tracking-[0.4em]">Salud del Crédito Global</h3>
+            <div class="flex-grow h-64"><canvas id="healthChart"></canvas></div>
         </div>
     </div>
 
-    <div class="flex justify-between items-center mb-4 px-2">
-        <h3 class="text-lg font-black text-gray-700">Pending Payments</h3>
-        <a href="{% url 'statements:history' %}" class="text-[10px] text-indigo-600 font-bold uppercase hover:underline">View History →</a>
+    <div class="flex justify-between items-center mb-6 px-4">
+        <h3 class="text-xl font-black text-slate-900 tracking-tight uppercase tracking-widest">Compromisos Pendientes</h3>
+        <a href="{% url 'statements:history' %}" class="text-[10px] text-blue-700 font-black uppercase tracking-widest hover:text-slate-900 transition-colors">Ver Historial →</a>
     </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
+    
+    <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-50 overflow-hidden mb-16">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Card</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Date</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount</th>
-                        <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-slate-900">
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Tarjeta</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Vencimiento</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Monto</th>
+                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Operación</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
+                <tbody class="divide-y divide-slate-100">
                     {% for statement in pending_statements %}
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-1 h-8 rounded-full" style="background-color: {{ statement.card.color }};"></div>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-6 whitespace-nowrap">
+                            <div class="flex items-center gap-4">
+                                <div class="w-1.5 h-10 rounded-full" style="background-color: {{ statement.card.color }};"></div>
                                 <div>
-                                    <div class="font-bold text-gray-900 text-sm">{{ statement.card.bank_name }}</div>
-                                    <div class="text-[10px] text-gray-400 font-bold">{{ statement.month_year|date:"F Y" }}</div>
+                                    <div class="font-black text-slate-900 text-sm">{{ statement.card.bank_name }}</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ statement.month_year|date:"F Y" }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">
-                            {{ statement.month_year|date:"M d, Y" }}
+                        <td class="px-8 py-6 whitespace-nowrap text-sm font-bold text-slate-600 uppercase">
+                            {{ statement.month_year|date:"d M, Y" }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ statement.non_interest_payment }}</span>
+                        <td class="px-8 py-6 whitespace-nowrap">
+                            <span class="amount-blur text-sm font-black text-slate-900 tabular-nums transition-all duration-500">${{ statement.non_interest_payment }}</span>
                         </td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" hx-target="closest tr" hx-swap="outerHTML swap:1s" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-on::after-request="setTimeout(() => { location.reload(); }, 1000)" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black hover:bg-indigo-600 hover:text-white transition-all uppercase">
-                                Paid
+                        <td class="px-8 py-6 text-right whitespace-nowrap">
+                            <button hx-post="{% url 'statements:mark_as_paid' statement.id %}" hx-target="closest tr" hx-swap="outerHTML" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-on::after-request="setTimeout(() => { location.reload(); }, 600)" class="bg-slate-100 text-slate-900 px-5 py-2 rounded-xl text-[10px] font-black hover:bg-slate-900 hover:text-white transition-all uppercase tracking-widest">
+                                Liquidar
                             </button>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" class="px-6 py-10 text-center text-gray-400 text-xs italic font-medium">No hay pagos pendientes.</td></tr>
+                    <tr><td colspan="4" class="px-8 py-16 text-center text-slate-400 text-xs italic font-medium">Libre de deudas para este periodo.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="flex justify-between items-center mb-6 px-2">
-        <h3 class="text-lg font-black text-gray-700">Installment Plans & MSI</h3>
-        <a href="{% url 'cards:plan_add' %}" class="bg-black text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase shadow-sm hover:bg-gray-800 transition-all">+ Add Plan</a>
+    <div class="flex justify-between items-center mb-8 px-4">
+        <h3 class="text-xl font-black text-slate-900 tracking-tight uppercase tracking-widest">Planes de Financiamiento</h3>
+        <a href="{% url 'cards:plan_add' %}" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-blue-900 transition-all">+ Nuevo Plan</a>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         {% for plan in installment_plans %}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group">
-            <form action="{% url 'cards:plan_delete' plan.id %}" method="post" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('¿Liquidar este plan manualmente?');">
+        <div class="bg-white rounded-[2rem] shadow-xl border border-slate-50 p-6 hover:border-blue-200 transition-all relative group overflow-hidden">
+            <form action="{% url 'cards:plan_delete' plan.id %}" method="post" class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('¿Liquidar este plan manualmente?');">
                 {% csrf_token %}
-                <button type="submit" class="text-gray-300 hover:text-red-500 p-1">
-                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                <button type="submit" class="text-slate-300 hover:text-red-500 transition-colors p-1">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
             </form>
-            <div class="flex justify-between items-start mb-4">
+            
+            <div class="flex justify-between items-start mb-6">
                 <div class="flex items-start gap-3">
-                    <div class="w-1 h-10 rounded-full" style="background-color: {{ plan.card.color }};"></div>
+                    <div class="w-1.5 h-12 rounded-full" style="background-color: {{ plan.card.color }};"></div>
                     <div>
-                        <h4 class="font-bold text-gray-800 text-sm truncate max-w-[120px]">{{ plan.name }}</h4>
-                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if plan.type == 'MSI' %}bg-emerald-50 text-emerald-600{% else %}bg-amber-50 text-amber-600{% endif %} font-black uppercase tracking-tighter">{{ plan.get_type_display }}</span>
+                        <h4 class="font-black text-slate-900 text-sm truncate max-w-[140px] uppercase">{{ plan.name }}</h4>
+                        <span class="text-[9px] px-3 py-1 rounded-full mt-2 inline-block {% if plan.type == 'MSI' %}bg-blue-50 text-blue-700 border border-blue-100{% else %}bg-slate-50 text-slate-600 border border-slate-100{% endif %} font-black uppercase tracking-widest">{{ plan.get_type_display }}</span>
                     </div>
                 </div>
-                <div class="text-right pr-6">
-                    <span class="amount-blur text-sm font-black text-gray-900 transition-all duration-300">${{ plan.monthly_payment }}</span>
-                    <p class="text-[9px] text-gray-400 font-bold uppercase">/ Mes</p>
+                <div class="text-right">
+                    <span class="amount-blur text-base font-black text-slate-900 transition-all duration-500 tabular-nums">${{ plan.monthly_payment }}</span>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">/ Mensual</p>
                 </div>
             </div>
-            <div class="space-y-2 mt-4">
-                <div class="flex justify-between text-[10px] font-black text-gray-400">
-                    <span>{{ plan.current_installment }} / {{ plan.total_installments }} cuotas</span>
-                    <span class="text-indigo-600">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
+            
+            <div class="space-y-3 mt-6">
+                <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <span>{{ plan.current_installment }} de {{ plan.total_installments }} Cuotas</span>
+                    <span class="text-blue-700">{% widthratio plan.current_installment plan.total_installments 100 %}%</span>
                 </div>
-                <div class="w-full bg-gray-50 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-1000" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
+                <div class="w-full bg-slate-50 rounded-full h-2 overflow-hidden border border-slate-100">
+                    <div class="bg-slate-900 h-full rounded-full transition-all duration-1000" style="width: {% widthratio plan.current_installment plan.total_installments 100 %}%"></div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <div class="px-2 mb-6 text-lg font-black text-gray-700">My Credit Cards</div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div class="px-4 mb-8 text-xl font-black text-slate-900 tracking-tight uppercase tracking-widest italic">Mis Credenciales</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for card in cards %}
-        <div class="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden h-48 flex flex-col justify-between" style="background-color: {{ card.color|default:'#4f46e5' }};">
+        <div class="rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden h-56 flex flex-col justify-between group transition-transform hover:-translate-y-2" style="background-color: {{ card.color|default:'#0f172a' }};">
+            <div class="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 transition-all duration-1000 group-hover:left-full"></div>
+
             <div class="relative z-10 flex justify-between items-start">
-                <span class="font-black text-xl italic tracking-tighter">{{ card.bank_name }}</span>
-                <div class="flex space-x-1.5">
-                    <a href="{% url 'cards:card_edit' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-white/40"><i class="fa-solid fa-pen text-[10px]"></i></a>
-                    <a href="{% url 'cards:card_delete' card.pk %}" class="bg-white/20 p-2 rounded-xl hover:bg-red-500"><i class="fa-solid fa-trash text-[10px]"></i></a>
+                <span class="font-black text-2xl italic tracking-tighter uppercase">{{ card.bank_name }}</span>
+                <div class="flex space-x-2">
+                    <a href="{% url 'cards:card_edit' card.pk %}" class="bg-white/10 backdrop-blur-md p-3 rounded-xl hover:bg-white/30 transition-colors"><i class="fa-solid fa-pen-nib text-xs"></i></a>
+                    <a href="{% url 'cards:card_delete' card.pk %}" class="bg-white/10 backdrop-blur-md p-3 rounded-xl hover:bg-red-500 transition-colors"><i class="fa-solid fa-trash-alt text-xs"></i></a>
                 </div>
             </div>
+            
             <div class="relative z-10">
-                <h4 class="font-black tracking-[0.2em] uppercase text-xs opacity-90 mb-4">{{ card.card_name }}</h4>
-                <div class="flex justify-between items-end border-t border-white/10 pt-4">
+                <h4 class="font-bold tracking-[0.3em] uppercase text-xs text-white/70 mb-6 uppercase">{{ card.card_name }}</h4>
+                <div class="flex justify-between items-end border-t border-white/10 pt-5">
                     <div>
-                        <p class="text-[8px] font-black uppercase opacity-60">Limit</p>
-                        <p class="amount-blur text-sm font-black transition-all duration-300">${{ card.credit_limit }}</p>
+                        <p class="text-[8px] font-black uppercase tracking-widest text-white/50 mb-1">Línea de Crédito</p>
+                        <p class="amount-blur text-lg font-black tabular-nums transition-all duration-500">${{ card.credit_limit }}</p>
                     </div>
-                    <div class="bg-black/20 px-3 py-1.5 rounded-xl">
-                        <p class="text-[8px] font-black uppercase opacity-60 leading-none">Corte</p>
-                        <p class="text-[11px] font-black italic">{{ card.closing_day }}th</p>
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
+                        <p class="text-[8px] font-black uppercase text-white/50 mb-1">Corte</p>
+                        <p class="text-xs font-black italic">Día {{ card.closing_day }}</p>
                     </div>
                 </div>
             </div>
@@ -244,19 +264,31 @@
     });
 
     const chartOptions = { 
-        maintainAspectRatio: false, cutout: '78%', 
-        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 10, weight: '700' }, color: '#9ca3af' } } }
+        maintainAspectRatio: false, 
+        cutout: '82%', 
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { 
+                    usePointStyle: true, 
+                    padding: 25, 
+                    font: { size: 10, weight: '900' }, 
+                    color: '#64748b' 
+                } 
+            } 
+        },
+        animation: { duration: 2000, easing: 'easeOutElastic' }
     };
     
     new Chart(document.getElementById('limitsChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: {{ chart_labels|safe }}, datasets: [{ data: {{ chart_limits|safe }}, backgroundColor: {{ chart_colors|safe }}, borderWidth: 0 }] },
+        data: { labels: {{ chart_labels|safe }}, datasets: [{ data: {{ chart_limits|safe }}, backgroundColor: {{ chart_colors|safe }}, borderWidth: 0, hoverOffset: 15 }] },
         options: chartOptions
     });
 
     new Chart(document.getElementById('healthChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Due This Month', 'Locked (MSI)', 'Available Credit'], datasets: [{ data: {{ debt_data|safe }}, backgroundColor: ['#f43f5e', '#9ca3af', '#10b981'], borderWidth: 0 }] },
+        data: { labels: ['Corte Actual', 'Bloqueado (MSI)', 'Crédito Disponible'], datasets: [{ data: {{ debt_data|safe }}, backgroundColor: ['#1e3a8a', '#94a3b8', '#0f172a'], borderWidth: 0, hoverOffset: 15 }] },
         options: chartOptions
     });
 </script>

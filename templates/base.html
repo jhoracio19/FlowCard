@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,47 +8,86 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     
     <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'img/logo-touch.png' %}">
     
     <style>
-        /* Animación suave para eliminar filas con HTMX */
-        .htmx-swapping { opacity: 0; transition: opacity 1s ease-out; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Prevenir que el scroll horizontal se rompa en móviles */
-        body { overflow-x: hidden; }
+        /* Efecto de desvanecimiento para HTMX */
+        .htmx-swapping { opacity: 0; transition: opacity 0.6s ease-out; }
+        
+        /* Scrollbar personalizada Naval */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0f172a; }
+
+        /* Estilo para los inputs de calendario en móvil */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(10%) sepia(20%) saturate(1000%) hue-rotate(180deg) brightness(90%) contrast(90%);
+        }
     </style>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
-    <nav class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-            <a href="{% url 'cards:dashboard' %}" class="flex items-center">
-                <i class="fa-solid fa-credit-card text-indigo-600 text-2xl mr-2"></i>
-                <span class="font-bold text-xl text-gray-800 tracking-tight">FlowCard</span>
+<body class="bg-slate-50 flex flex-col min-h-screen text-slate-900">
+    
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            
+            <a href="{% url 'cards:dashboard' %}" class="flex items-center group">
+                <div class="bg-slate-900 p-2 rounded-xl mr-3 transform transition-transform group-hover:rotate-6">
+                    <i class="fa-solid fa-layer-group text-white text-xl"></i>
+                </div>
+                <span class="font-black text-2xl text-slate-900 tracking-tighter">Flow<span class="text-blue-700">Card</span></span>
             </a>
-            <div class="flex items-center space-x-4">
+
+            <div class="flex items-center gap-6">
                 {% if user.is_authenticated %}
-                
-                    <span class="text-xs md:text-sm text-gray-600">Hi, <b>{{ user.username }}</b></span>
+                    <div class="hidden md:flex flex-col text-right">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Usuario Activo</span>
+                        <span class="text-sm font-bold text-slate-700">{{ user.username }}</span>
+                    </div>
+                    
+                    <div class="h-10 w-[1px] bg-slate-200 hidden md:block"></div>
+
                     <form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
-                        <button type="submit" class="text-red-600 text-xs md:text-sm font-bold hover:underline">Logout</button>
+                        <button type="submit" class="bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 p-3 rounded-xl transition-all border border-transparent hover:border-red-100 group">
+                            <i class="fa-solid fa-power-off text-sm group-hover:scale-110"></i>
+                        </button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-gray-600 text-sm">Login</a>
+                    <a href="{% url 'login' %}" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-900 transition-all shadow-lg shadow-slate-200">
+                        Login
+                    </a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
+    <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-white border-t py-6 text-center text-gray-400 text-xs">
-        &copy; {% now "Y" %} FlowCard. Smart Credit Management.
+    <footer class="bg-white border-t border-slate-100 py-10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center">
+                <span class="font-black text-lg text-slate-300 tracking-tighter italic">FlowCard</span>
+                <span class="ml-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Protocolo de Gestión Inteligente</span>
+            </div>
+            
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                &copy; {% now "Y" %} Desarrollado para Control de Activos Financieros
+            </div>
+
+            <div class="flex gap-4">
+                <i class="fa-brands fa-cc-visa text-slate-200 text-xl"></i>
+                <i class="fa-brands fa-cc-mastercard text-slate-200 text-xl"></i>
+                <i class="fa-brands fa-cc-amex text-slate-200 text-xl"></i>
+            </div>
+        </div>
     </footer>
 
     {% block extra_js %}{% endblock %}

@@ -1,59 +1,125 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Payment Plan - FlowCard{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Plan{% else %}Nuevo Plan de Pago{% endif %} - FlowCard{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">New Payment Plan</h1>
-        <p class="text-gray-500">Register MSI or Fixed Payments to track them monthly.</p>
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="mb-10 text-center md:text-left">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-slate-900 rounded-2xl mb-4 shadow-lg shadow-slate-200">
+            <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
+        </div>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Registro de Plan</h1>
+        <p class="text-slate-500 mt-2 font-medium">Configura tus Meses Sin Intereses o Pagos Fijos para un rastreo preciso.</p>
     </div>
 
-    <form method="post" class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+    <form method="post" class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-50 space-y-8">
         {% csrf_token %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Plan Name</label>
-                {{ form.name }}
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Concepto de la Compra</label>
+                <div class="relative">
+                    {{ form.name }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                </div>
+                {% if form.name.errors %}<p class="mt-2 text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ form.name.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="group">
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Tarjeta Vinculada</label>
+                <div class="relative">{{ form.card }}</div>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Card</label>
-                {{ form.card }}
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Tipo de Financiamiento</label>
+                <div class="relative">{{ form.type }}</div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Monto Total</label>
+                <div class="relative">
+                    {{ form.total_amount }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Type</label>
-                {{ form.type }}
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Pago Mensual</label>
+                <div class="relative">
+                    {{ form.monthly_payment }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Meses Totales</label>
+                <div class="relative">
+                    {{ form.total_installments }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Total Amount</label>
-                {{ form.total_amount }}
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Mes de Inicio</label>
+                <div class="relative">
+                    {{ form.current_installment }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-list-ol"></i>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Monthly Payment</label>
-                {{ form.monthly_payment }}
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Total Months</label>
-                {{ form.total_installments }}
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Starting at Month</label>
-                {{ form.current_installment }}
-            </div>
+
             <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-gray-700 mb-2">First Payment Date</label>
-                {{ form.start_date }}
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Primer Pago Programado</label>
+                <div class="relative">
+                    {{ form.start_date }}
+                    <div class="absolute inset-y-0 right-4 flex items-center text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-calendar-day"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="pt-4 flex gap-3">
-            <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition">
-                Save Plan
+        <div class="pt-8 flex flex-col sm:flex-row gap-4">
+            <button type="submit" class="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm tracking-widest hover:bg-blue-900 transform transition-all hover:shadow-2xl hover:shadow-blue-900/20 active:scale-95 flex items-center justify-center gap-3">
+                <i class="fa-solid fa-floppy-disk text-blue-400"></i>
+                GUARDAR PLAN
             </button>
-            <a href="{% url 'cards:dashboard' %}" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-center hover:bg-gray-200 transition">
-                Cancel
+            <a href="{% url 'cards:dashboard' %}" class="flex-1 bg-slate-50 text-slate-400 py-4 rounded-2xl font-black text-xs tracking-widest text-center hover:bg-slate-100 hover:text-slate-600 transition-all uppercase flex items-center justify-center gap-2">
+                Cancelar Operación
             </a>
         </div>
     </form>
 </div>
+
+<style>
+    /* Estilización Naval de los Inputs para uniformidad con las Tarjetas */
+    input, select {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        background-color: #f8fafc !important;
+        border: 2px solid #f1f5f9 !important;
+        border-radius: 1.25rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+        transition: all 0.3s ease !important;
+        outline: none !important;
+        appearance: none !important;
+    }
+
+    input:focus, select:focus {
+        background-color: #fff !important;
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 0 0 5px rgba(29, 78, 216, 0.08) !important;
+    }
+
+    /* Ajuste para inputs con iconos para que no se encimen */
+    input { padding-right: 3rem !important; }
+</style>
 {% endblock %}
